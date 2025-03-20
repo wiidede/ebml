@@ -6,6 +6,7 @@ forked from [embl](https://github.com/node-ebml/node-ebml)
 
 - esm only
 - remove debug
+- remove buffer using Uint8Array
 
 ---
 

@@ -3,20 +3,50 @@ import schema from './schema'
 import tools from './tools'
 
 function encodeTag(tagId, tagData, end) {
-  const data = [new Uint8Array(Array.from(tagId.toString(16), 'hex').match(/.{1,2}/g).map(byte => Number.parseInt(byte, 16)))]
-  if (end === -1) {
-    data.push(new Uint8Array([0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]))
+  // Convert tagId to hex string and create Uint8Array
+  const hexString = tagId.toString(16).padStart(2, '0')
+  const idBytes = new Uint8Array(hexString.match(/.{1,2}/g).map(byte => Number.parseInt(byte, 16)))
+
+  // Convert tagData to Uint8Array first
+  let dataBytes
+  if (tagData instanceof Uint8Array) {
+    dataBytes = tagData
+  }
+  else if (Array.isArray(tagData)) {
+    dataBytes = new Uint8Array(tagData)
+  }
+  else if (tagData instanceof ArrayBuffer) {
+    dataBytes = new Uint8Array(tagData)
   }
   else {
-    data.push(tools.writeVint(tagData.length))
+    // For single number, treat as byte value
+    dataBytes = new Uint8Array([tagData])
   }
 
-  // cast ArrayBuffer to Uint8Array
-  if (!(tagData instanceof Uint8Array)) {
-    tagData = new Uint8Array(tagData)
+  // Calculate length bytes
+  let lengthBytes
+  if (end === -1) {
+    // For unknown size (-1), use 8 bytes of 0xFF
+    lengthBytes = new Uint8Array(8).fill(0xFF)
+    // Set the first byte to indicate 8 bytes follow
+    lengthBytes[0] = 0x01
   }
-  data.push(tagData)
-  return tools.concatenate(...data)
+  else if (dataBytes.length === 0) {
+    // For empty data, use 0x80 to indicate 1 byte of 0x00 follows
+    lengthBytes = new Uint8Array([0x80])
+  }
+  else {
+    // For known size, use the actual data length
+    lengthBytes = tools.writeVint(dataBytes.length)
+  }
+
+  // For empty data, we only need ID and length
+  if (dataBytes.length === 0) {
+    return tools.concatenate(idBytes, lengthBytes)
+  }
+
+  // Concatenate all parts in order: ID + Length + Data
+  return tools.concatenate(tools.concatenate(idBytes, lengthBytes), dataBytes)
 }
 
 /**
@@ -207,6 +237,7 @@ export default class EbmlEncoder extends Transform {
       children: [],
       data: { buffer: new Uint8Array([]) },
     }
+
     const childTagDataBuffers = tag.children.map(child => child.data)
     tag.data = encodeTag(tag.id, tools.concatenate(...childTagDataBuffers), tag.end)
     if (this.stack.length < 1) {

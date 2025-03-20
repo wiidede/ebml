@@ -1,5 +1,4 @@
-import Buffer from 'node:buffer'
-import { describe, it } from 'jest'
+import { describe, it } from '@jest/globals'
 import forEach from 'lodash.foreach'
 import range from 'lodash.range'
 import unexpected from 'unexpected'
@@ -18,10 +17,10 @@ describe('EBML', () => {
       }
 
       it('should read the correct value for all 1 byte integers', () => {
-        forEach(range(0x80), i => readVint(Buffer.from([i | 0x80]), i))
+        forEach(range(0x80), i => readVint(new Uint8Array([i | 0x80]), i))
       })
       it('should read the correct value for 1 byte int with non-zero start', () => {
-        const b = Buffer.from([0x00, 0x81])
+        const b = new Uint8Array([0x00, 0x81])
         const vint = tools.readVint(b, 1)
         expect(vint.value, 'to be', 1)
         expect(vint.length, 'to be', 1)
@@ -29,64 +28,62 @@ describe('EBML', () => {
       it('should read the correct value for all 2 byte integers', () => {
         forEach(range(0x40), i =>
           forEach(range(0xFF), (j) => {
-            readVint(Buffer.from([i | 0x40, j]), (i << 8) + j)
+            readVint(new Uint8Array([i | 0x40, j]), (i << 8) + j)
           }))
       })
       it('should read the correct value for all 3 byte integers', () => {
         forEach(range(0, 0x20, 1), i =>
           forEach(range(0, 0xFF, 2), j =>
             forEach(range(0, 0xFF, 3), (k) => {
-              readVint(Buffer.from([i | 0x20, j, k]), (i << 16) + (j << 8) + k)
+              readVint(new Uint8Array([i | 0x20, j, k]), (i << 16) + (j << 8) + k)
             })))
       })
-      // not brute forcing any more bytes, takes sooo long
       it('should read the correct value for 4 byte int min/max values', () => {
-        readVint(Buffer.from([0x10, 0x20, 0x00, 0x00]), 2 ** 21)
-        readVint(Buffer.from([0x1F, 0xFF, 0xFF, 0xFF]), 2 ** 28 - 1)
+        readVint(new Uint8Array([0x10, 0x20, 0x00, 0x00]), 2 ** 21)
+        readVint(new Uint8Array([0x1F, 0xFF, 0xFF, 0xFF]), 2 ** 28 - 1)
       })
       it('should read the correct value for 5 byte int min/max values', () => {
-        readVint(Buffer.from([0x08, 0x10, 0x00, 0x00, 0x00]), 2 ** 28)
-        readVint(Buffer.from([0x0F, 0xFF, 0xFF, 0xFF, 0xFF]), 2 ** 35 - 1)
+        readVint(new Uint8Array([0x08, 0x10, 0x00, 0x00, 0x00]), 2 ** 28)
+        readVint(new Uint8Array([0x0F, 0xFF, 0xFF, 0xFF, 0xFF]), 2 ** 35 - 1)
       })
       it('should read the correct value for 6 byte int min/max values', () => {
-        readVint(Buffer.from([0x04, 0x08, 0x00, 0x00, 0x00, 0x00]), 2 ** 35)
+        readVint(new Uint8Array([0x04, 0x08, 0x00, 0x00, 0x00, 0x00]), 2 ** 35)
         readVint(
-          Buffer.from([0x07, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+          new Uint8Array([0x07, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
           2 ** 42 - 1,
         )
       })
       it('should read the correct value for 7 byte int min/max values', () => {
         readVint(
-          Buffer.from([0x02, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00]),
+          new Uint8Array([0x02, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00]),
           2 ** 42,
         )
         readVint(
-          Buffer.from([0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+          new Uint8Array([0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
           2 ** 49 - 1,
         )
       })
       it('should read the correct value for 8 byte int min value', () => {
         readVint(
-          Buffer.from([0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+          new Uint8Array([0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
           2 ** 49,
         )
       })
       it('should read the correct value for the max representable JS number (2^53)', () => {
         readVint(
-          Buffer.from([0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+          new Uint8Array([0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
           2 ** 53,
         )
       })
-      // an unknown value is represented by -1
       it('should return value -1 for more than max representable JS number (2^53 + 1)', () => {
         readVint(
-          Buffer.from([0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]),
+          new Uint8Array([0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]),
           -1,
         )
       })
       it('should return value -1 for more than max representable JS number (8 byte int max value)', () => {
         readVint(
-          Buffer.from([0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+          new Uint8Array([0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
           -1,
         )
       })
@@ -94,7 +91,7 @@ describe('EBML', () => {
         expect(
           () => {
             tools.readVint(
-              Buffer.from([
+              new Uint8Array([
                 0x00,
                 0x80,
                 0x00,
@@ -115,7 +112,7 @@ describe('EBML', () => {
     describe('#writeVint()', () => {
       function writeVint(value, expected) {
         const actual = tools.writeVint(value)
-        expect(expected.toString('hex'), 'to be', actual.toString('hex'))
+        expect(Array.from(expected).map(b => b.toString(16).padStart(2, '0')).join(''), 'to be', Array.from(actual).map(b => b.toString(16).padStart(2, '0')).join(''))
       }
 
       it('should throw when writing -1', () => {
@@ -128,66 +125,56 @@ describe('EBML', () => {
         )
       })
       it('should write all 1 byte integers', () => {
-        forEach(range(0, 0x80 - 1), i => writeVint(i, Buffer.from([i | 0x80])))
+        forEach(range(0, 0x80 - 1), i => writeVint(i, new Uint8Array([i | 0x80])))
       })
       it('should write 2 byte int min/max values', () => {
-        writeVint(2 ** 7 - 1, Buffer.from([0x40, 0x7F]))
-        writeVint(2 ** 14 - 2, Buffer.from([0x7F, 0xFE]))
+        writeVint(2 ** 7 - 1, new Uint8Array([0x40, 0x7F]))
+        writeVint(2 ** 14 - 2, new Uint8Array([0x7F, 0xFE]))
       })
       it('should write 3 byte int min/max values', () => {
-        writeVint(2 ** 14 - 1, Buffer.from([0x20, 0x3F, 0xFF]))
-        writeVint(2 ** 21 - 2, Buffer.from([0x3F, 0xFF, 0xFE]))
+        writeVint(2 ** 14 - 1, new Uint8Array([0x20, 0x3F, 0xFF]))
+        writeVint(2 ** 21 - 2, new Uint8Array([0x3F, 0xFF, 0xFE]))
       })
       it('should write 4 byte int min/max values', () => {
-        writeVint(2 ** 21 - 1, Buffer.from([0x10, 0x1F, 0xFF, 0xFF]))
-        writeVint(2 ** 28 - 2, Buffer.from([0x1F, 0xFF, 0xFF, 0xFE]))
+        writeVint(2 ** 21 - 1, new Uint8Array([0x10, 0x1F, 0xFF, 0xFF]))
+        writeVint(2 ** 28 - 2, new Uint8Array([0x1F, 0xFF, 0xFF, 0xFE]))
       })
       it('should write 5 byte int min/max value', () => {
-        writeVint(2 ** 28 - 1, Buffer.from([0x08, 0x0F, 0xFF, 0xFF, 0xFF]))
-        writeVint(2 ** 35 - 2, Buffer.from([0x0F, 0xFF, 0xFF, 0xFF, 0xFE]))
+        writeVint(2 ** 28 - 1, new Uint8Array([0x08, 0x0F, 0xFF, 0xFF, 0xFF]))
+        writeVint(2 ** 35 - 2, new Uint8Array([0x0F, 0xFF, 0xFF, 0xFF, 0xFE]))
       })
       it('should write 6 byte int min/max value', () => {
         writeVint(
           2 ** 35 - 1,
-          Buffer.from([0x04, 0x07, 0xFF, 0xFF, 0xFF, 0xFF]),
+          new Uint8Array([0x04, 0x07, 0xFF, 0xFF, 0xFF, 0xFF]),
         )
         writeVint(
           2 ** 42 - 2,
-          Buffer.from([0x07, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE]),
+          new Uint8Array([0x07, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE]),
         )
       })
       it('should write 7 byte int min/max value', () => {
         writeVint(
           2 ** 42 - 1,
-          Buffer.from([0x02, 0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+          new Uint8Array([0x02, 0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
         )
         writeVint(
           2 ** 49 - 2,
-          Buffer.from([0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE]),
+          new Uint8Array([0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE]),
         )
       })
       it('should write the correct value for 8 byte int min value', () => {
         writeVint(
           2 ** 49 - 1,
-          Buffer.from([0x01, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
+          new Uint8Array([0x01, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]),
         )
       })
       it('should write the correct value for the max representable JS number (2^53)', () => {
         writeVint(
           2 ** 53,
-          Buffer.from([0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+          new Uint8Array([0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
         )
       })
-
-      /*
-       * can't prevent this, 2^53 + 1 === 2^53
-       * it('should throw for more than max representable JS number (2^53 + 1)', function() {
-       *     assert.throws(function() {
-       *         tools.writeVint((2 ** 53) + 1));
-       *     }, /Unrepresentable value/)
-       * })
-       */
-
       it('should throw for more than max representable JS number (8 byte int max value)', () => {
         expect(
           () => {
@@ -210,30 +197,30 @@ describe('EBML', () => {
     describe('#concatenate', () => {
       it('returns the 2nd buffer if the first is invalid', () => {
         expect(
-          tools.concatenate(null, Buffer.from([0x01])),
+          tools.concatenate(null, new Uint8Array([0x01])),
           'to equal',
-          Buffer.from([0x01]),
+          new Uint8Array([0x01]),
         )
       })
       it('returns the 1st buffer if the second is invalid', () => {
         expect(
-          tools.concatenate(Buffer.from([0x01]), null),
+          tools.concatenate(new Uint8Array([0x01]), null),
           'to equal',
-          Buffer.from([0x01]),
+          new Uint8Array([0x01]),
         )
       })
       it('returns the two buffers joined if both are valid', () => {
         expect(
-          tools.concatenate(Buffer.from([0x01]), Buffer.from([0x01])),
+          tools.concatenate(new Uint8Array([0x01]), new Uint8Array([0x01])),
           'to equal',
-          Buffer.from([0x01, 0x01]),
+          new Uint8Array([0x01, 0x01]),
         )
       })
     })
     describe('#readFloat', () => {
       it('can read 32-bit floats', () => {
         expect(
-          tools.readFloat(Buffer.from([0x40, 0x20, 0x00, 0x00])),
+          tools.readFloat(new Uint8Array([0x40, 0x20, 0x00, 0x00])),
           'to equal',
           2.5,
         )
@@ -241,38 +228,38 @@ describe('EBML', () => {
       it('can read 64-bit floats', () => {
         expect(
           tools.readFloat(
-            Buffer.from([0x40, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+            new Uint8Array([0x40, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
           ),
           'to equal',
           2.5,
         )
       })
       it('returns NaN with invalid sized arrays', () => {
-        expect(tools.readFloat(Buffer.from([0x40, 0x20, 0x00])), 'to be NaN')
+        expect(tools.readFloat(new Uint8Array([0x40, 0x20, 0x00])), 'to be NaN')
       })
     })
     describe('#readUnsigned', () => {
       it('handles 8-bit integers', () => {
-        expect(tools.readUnsigned(Buffer.from([0x07])), 'to equal', 7)
+        expect(tools.readUnsigned(new Uint8Array([0x07])), 'to equal', 7)
       })
       it('handles 16-bit integers', () => {
-        expect(tools.readUnsigned(Buffer.from([0x07, 0x07])), 'to equal', 1799)
+        expect(tools.readUnsigned(new Uint8Array([0x07, 0x07])), 'to equal', 1799)
       })
       it('handles 32-bit integers', () => {
         expect(
-          tools.readUnsigned(Buffer.from([0x07, 0x07, 0x07, 0x07])),
+          tools.readUnsigned(new Uint8Array([0x07, 0x07, 0x07, 0x07])),
           'to equal',
           117901063,
         )
       })
       it('handles integers smaller than 49 bits as numbers', () => {
         expect(
-          tools.readUnsigned(Buffer.from([0x07, 0x07, 0x07, 0x07, 0x07])),
+          tools.readUnsigned(new Uint8Array([0x07, 0x07, 0x07, 0x07, 0x07])),
           'to equal',
           30182672135,
         )
         expect(
-          tools.readUnsigned(Buffer.from([0x07, 0x07, 0x07, 0x07, 0x07, 0x07])),
+          tools.readUnsigned(new Uint8Array([0x07, 0x07, 0x07, 0x07, 0x07, 0x07])),
           'to equal',
           7726764066567,
         )
@@ -280,7 +267,7 @@ describe('EBML', () => {
       it('returns integers 49 bits or larger as strings', () => {
         expect(
           tools.readUnsigned(
-            Buffer.from([0x1, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07]),
+            new Uint8Array([0x1, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07]),
           ),
           'to be a string',
         ).and('to equal', '01070707070707')
@@ -288,33 +275,33 @@ describe('EBML', () => {
     })
     describe('#readUtf8', () => {
       it('handles 8-bit strings', () => {
-        expect(tools.readUtf8(Buffer.from([0x45])), 'to be a string').and(
+        expect(tools.readUtf8(new Uint8Array([0x45])), 'to be a string').and(
           'to equal',
           'E',
         )
       })
       it('handles 16-bit strings', () => {
-        expect(tools.readUtf8(Buffer.from([0x45, 0x42])), 'to be a string').and(
+        expect(tools.readUtf8(new Uint8Array([0x45, 0x42])), 'to be a string').and(
           'to equal',
           'EB',
         )
       })
       it('handles 24-bit strings', () => {
         expect(
-          tools.readUtf8(Buffer.from([0x45, 0x42, 0x4D])),
+          tools.readUtf8(new Uint8Array([0x45, 0x42, 0x4D])),
           'to be a string',
         ).and('to equal', 'EBM')
       })
       it('handles 32-bit strings', () => {
         expect(
-          tools.readUtf8(Buffer.from([0x45, 0x42, 0x4D, 0x4C])),
+          tools.readUtf8(new Uint8Array([0x45, 0x42, 0x4D, 0x4C])),
           'to be a string',
         ).and('to equal', 'EBML')
       })
       it('handles complex strings', () => {
         expect(
           tools.readUtf8(
-            Buffer.from([
+            new Uint8Array([
               0x41,
               0x20,
               0x6E,
@@ -618,26 +605,26 @@ describe('EBML', () => {
     })
     describe('#readSigned', () => {
       it('handles 8-bit integers', () => {
-        expect(tools.readSigned(Buffer.from([0x07])), 'to equal', 7)
+        expect(tools.readSigned(new Uint8Array([0x07])), 'to equal', 7)
       })
       it('handles 16-bit integers', () => {
-        expect(tools.readSigned(Buffer.from([0x07, 0x07])), 'to equal', 1799)
+        expect(tools.readSigned(new Uint8Array([0x07, 0x07])), 'to equal', 1799)
       })
       it('handles 32-bit integers', () => {
         expect(
-          tools.readSigned(Buffer.from([0x07, 0x07, 0x07, 0x07])),
+          tools.readSigned(new Uint8Array([0x07, 0x07, 0x07, 0x07])),
           'to equal',
           117901063,
         )
       })
       it('returns NaN with invalid sized arrays', () => {
-        expect(tools.readSigned(Buffer.from([0x40, 0x20, 0x00])), 'to be NaN')
+        expect(tools.readSigned(new Uint8Array([0x40, 0x20, 0x00])), 'to be NaN')
       })
     })
     describe('#readDataFromTag', () => {
       it('can read a string from a tag', () => {
         const tagData = { type: 's', name: 'DocType' }
-        const buf = Buffer.from([
+        const buf = new Uint8Array([
           0x6D,
           0x61,
           0x74,
@@ -651,10 +638,10 @@ describe('EBML', () => {
           type: 's',
           name: 'DocType',
           data: expect
-            .it('to be a', Buffer)
+            .it('to be a', Uint8Array)
             .and(
               'to equal',
-              Buffer.from([0x6D, 0x61, 0x74, 0x72, 0x6F, 0x73, 0x6B, 0x61]),
+              new Uint8Array([0x6D, 0x61, 0x74, 0x72, 0x6F, 0x73, 0x6B, 0x61]),
             ),
           value: 'matroska',
         })
@@ -664,13 +651,13 @@ describe('EBML', () => {
           type: 'u',
           name: 'TrackType',
         }
-        const buf = Buffer.from([0x77])
+        const buf = new Uint8Array([0x77])
         expect(tools.readDataFromTag(tagData, buf), 'to satisfy', {
           type: 'u',
           name: 'TrackType',
           data: expect
-            .it('to be a', Buffer)
-            .and('to equal', Buffer.from([0x77])),
+            .it('to be a', Uint8Array)
+            .and('to equal', new Uint8Array([0x77])),
           value: 119,
         })
       })
@@ -679,13 +666,13 @@ describe('EBML', () => {
           type: 'i',
           name: 'TrackOffset',
         }
-        const buf = Buffer.from([0xA7])
+        const buf = new Uint8Array([0xA7])
         expect(tools.readDataFromTag(tagData, buf), 'to satisfy', {
           type: 'i',
           name: 'TrackOffset',
           data: expect
-            .it('to be a', Buffer)
-            .and('to equal', Buffer.from([0xA7])),
+            .it('to be a', Uint8Array)
+            .and('to equal', new Uint8Array([0xA7])),
           value: -89,
         })
       })
@@ -694,38 +681,38 @@ describe('EBML', () => {
           type: 'f',
           name: 'Duration',
         }
-        const buf = Buffer.from([0x40, 0x00, 0x00, 0x77])
+        const buf = new Uint8Array([0x40, 0x00, 0x00, 0x77])
         expect(tools.readDataFromTag(tagData, buf), 'to satisfy', {
           type: 'f',
           name: 'Duration',
           data: expect
-            .it('to be a', Buffer)
-            .and('to equal', Buffer.from([0x40, 0x00, 0x00, 0x77])),
+            .it('to be a', Uint8Array)
+            .and('to equal', new Uint8Array([0x40, 0x00, 0x00, 0x77])),
           value: expect.it('to be close to', 2.00003, 1e-5),
         })
       })
     })
     describe('#readDate', () => {
       it('handles 8-bit integers', () => {
-        expect(tools.readDate(Buffer.from([0x07])), 'to equal', new Date(7))
+        expect(tools.readDate(new Uint8Array([0x07])), 'to equal', new Date(7))
       })
       it('handles 16-bit integers', () => {
         expect(
-          tools.readDate(Buffer.from([0x07, 0x07])),
+          tools.readDate(new Uint8Array([0x07, 0x07])),
           'to equal',
           new Date(1799),
         )
       })
       it('handles 32-bit integers', () => {
         expect(
-          tools.readDate(Buffer.from([0x07, 0x07, 0x07, 0x07])),
+          tools.readDate(new Uint8Array([0x07, 0x07, 0x07, 0x07])),
           'to equal',
           new Date(117901063),
         )
       })
       it('returns now with invalid sized arrays', () => {
         expect(
-          tools.readDate(Buffer.from([0x40, 0x20, 0x00])),
+          tools.readDate(new Uint8Array([0x40, 0x20, 0x00])),
           'to be close to',
           new Date(0),
           2000,

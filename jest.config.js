@@ -1,7 +1,6 @@
 export default {
-  collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.js'],
-  coverageDirectory: './coverage',
-  coverageReporters: ['json', 'lcov', 'text', 'html'],
-  testURL: 'http://localhost/',
+  transform: {},
+  moduleNameMapper: { '^(\.{1,2}/.*)\.js$': '$1' },
+  testEnvironment: 'node',
+  testEnvironmentOptions: { url: 'http://localhost' },
 }

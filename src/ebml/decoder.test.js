@@ -1,5 +1,4 @@
-import Buffer from 'node:buffer'
-import { describe, it } from 'jest'
+import { describe, it } from '@jest/globals'
 import unexpected from 'unexpected'
 import unexpectedDate from 'unexpected-date'
 import Decoder from './decoder'
@@ -14,7 +13,7 @@ describe('EBML', () => {
   describe('Decoder', () => {
     it('should wait for more data if a tag is longer than the buffer', () => {
       const decoder = new Decoder()
-      decoder.write(Buffer.from([0x1A, 0x45]))
+      decoder.write(new Uint8Array([0x1A, 0x45]))
 
       expect(decoder.state, 'to be', STATE_TAG)
       expect(decoder.buffer.length, 'to be', 2)
@@ -23,7 +22,7 @@ describe('EBML', () => {
 
     it('should clear the buffer after a full tag is written in one chunk', () => {
       const decoder = new Decoder()
-      decoder.write(Buffer.from([0x42, 0x86, 0x81, 0x01]))
+      decoder.write(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
 
       expect(decoder.state, 'to be', STATE_TAG)
       expect(decoder.buffer.length, 'to be', 0)
@@ -33,8 +32,8 @@ describe('EBML', () => {
     it('should clear the buffer after a full tag is written in multiple chunks', () => {
       const decoder = new Decoder()
 
-      decoder.write(Buffer.from([0x42, 0x86]))
-      decoder.write(Buffer.from([0x81, 0x01]))
+      decoder.write(new Uint8Array([0x42, 0x86]))
+      decoder.write(new Uint8Array([0x81, 0x01]))
 
       expect(decoder.state, 'to be', STATE_TAG)
       expect(decoder.buffer.length, 'to be', 0)
@@ -44,25 +43,25 @@ describe('EBML', () => {
     it('should increment the cursor on each step', () => {
       const decoder = new Decoder()
 
-      decoder.write(Buffer.from([0x42])) // 4
+      decoder.write(new Uint8Array([0x42])) // 4
 
       expect(decoder.state, 'to be', STATE_TAG)
       expect(decoder.buffer.length, 'to be', 1)
       expect(decoder.cursor, 'to be', 0)
 
-      decoder.write(Buffer.from([0x86])) // 5
+      decoder.write(new Uint8Array([0x86])) // 5
 
       expect(decoder.state, 'to be', STATE_SIZE)
       expect(decoder.buffer.length, 'to be', 2)
       expect(decoder.cursor, 'to be', 2)
 
-      decoder.write(Buffer.from([0x81])) // 6 & 7
+      decoder.write(new Uint8Array([0x81])) // 6 & 7
 
       expect(decoder.state, 'to be', STATE_CONTENT)
       expect(decoder.buffer.length, 'to be', 3)
       expect(decoder.cursor, 'to be', 3)
 
-      decoder.write(Buffer.from([0x01])) // 6 & 7
+      decoder.write(new Uint8Array([0x01])) // 6 & 7
 
       expect(decoder.state, 'to be', STATE_TAG)
       expect(decoder.buffer.length, 'to be', 0)
@@ -77,12 +76,12 @@ describe('EBML', () => {
         expect(tagStr, 'to be', '4286')
         expect(dataSize, 'to be', 0x01)
         expect(type, 'to be', 'u')
-        expect(data, 'to equal', Buffer.from([0x01]))
+        expect(data, 'to equal', new Uint8Array([0x01]))
         done()
         decoder.on('finish', done)
       })
       decoder.on('finish', done)
-      decoder.write(Buffer.from([0x42, 0x86, 0x81, 0x01]))
+      decoder.write(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
       decoder.end()
     })
 
@@ -101,7 +100,7 @@ describe('EBML', () => {
       })
       decoder.on('finish', done)
 
-      decoder.write(Buffer.from([0x1A, 0x45, 0xDF, 0xA3, 0x80]))
+      decoder.write(new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x80]))
       decoder.end()
     })
 
@@ -126,8 +125,8 @@ describe('EBML', () => {
       })
       decoder.on('finish', done)
 
-      decoder.write(Buffer.from([0x1A, 0x45, 0xDF, 0xA3]))
-      decoder.write(Buffer.from([0x84, 0x42, 0x86, 0x81, 0x00]))
+      decoder.write(new Uint8Array([0x1A, 0x45, 0xDF, 0xA3]))
+      decoder.write(new Uint8Array([0x84, 0x42, 0x86, 0x81, 0x00]))
       decoder.end()
     })
     describe('::getSchemaInfo', () => {

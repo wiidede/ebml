@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { describe, it } from 'jest'
+import { describe, it } from '@jest/globals'
 import unexpected from 'unexpected'
 import { Decoder } from '../src/ebml'
 
@@ -10,7 +10,7 @@ const expect = unexpected.clone()
 describe('eBML', () => {
   describe('values in tags', () => {
     describe('aVC1', () => {
-      const data = fs.readFileSync('media/video-webm-codecs-avc1-42E01E.webm')
+      const data = new Uint8Array(fs.readFileSync('media/video-webm-codecs-avc1-42E01E.webm'))
 
       it('should get a correct PixelWidth value from a file (2-byte unsigned int)', (done) => {
         const decoder = new Decoder()
@@ -124,7 +124,7 @@ describe('eBML', () => {
     })
 
     describe('vP8', () => {
-      const data = fs.readFileSync('media/video-webm-codecs-vp8.webm')
+      const data = new Uint8Array(fs.readFileSync('media/video-webm-codecs-vp8.webm'))
 
       it('should get a correct PixelWidth value from a video/webm; codecs="vp8" file (2-byte unsigned int)', (done) => {
         const decoder = new Decoder()

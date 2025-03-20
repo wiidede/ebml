@@ -1,6 +1,5 @@
 import assert from 'node:assert'
-import Buffer from 'node:buffer'
-import { beforeAll, beforeEach, describe, it } from 'jest'
+import { beforeAll, beforeEach, describe, it } from '@jest/globals'
 import unexpected from 'unexpected'
 import unexpectedDate from 'unexpected-date'
 import Encoder from './encoder'
@@ -13,9 +12,9 @@ describe('EBML', () => {
       const encoder = new Encoder()
       encoder.on('data', (chunk) => {
         expect(
-          chunk.toString('hex'),
+          Array.from(chunk).map(b => b.toString(16).padStart(2, '0')).join(''),
           'to be',
-          Buffer.from(expected).toString('hex'),
+          Array.from(expected).map(b => b.toString(16).padStart(2, '0')).join(''),
         )
         encoder.on('finish', done)
         done()
@@ -25,19 +24,19 @@ describe('EBML', () => {
     }
 
     it('should write a single tag', (done) => {
-      const encoder = createEncoder([0x42, 0x86, 0x81, 0x01], done)
+      const encoder = createEncoder(new Uint8Array([0x42, 0x86, 0x81, 0x01]), done)
       encoder.write([
         'tag',
         {
           name: 'EBMLVersion',
-          data: Buffer.from([0x01]),
+          data: new Uint8Array([0x01]),
         },
       ])
       encoder.end()
     })
     it('should write a tag with a single child', (done) => {
       const encoder = createEncoder(
-        [0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00],
+        new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
         done,
       )
       encoder.write(['start', { name: 'EBML' }])
@@ -45,7 +44,7 @@ describe('EBML', () => {
         'tag',
         {
           name: 'EBMLVersion',
-          data: Buffer.from([0x00]),
+          data: new Uint8Array([0x00]),
         },
       ])
       encoder.write(['end', { name: 'EBML' }])
@@ -65,7 +64,7 @@ describe('EBML', () => {
           'tag',
           {
             name: 'EBMLVersion',
-            data: Buffer.from([0x00]),
+            data: new Uint8Array([0x00]),
           },
         ])
         encoder.cork()
@@ -78,7 +77,7 @@ describe('EBML', () => {
         // );
         assert.ok(
           encoder.buffer,
-          Buffer.from([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
+          new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
         )
       })
       it('should not block flushing when uncorked', () => {
@@ -87,7 +86,7 @@ describe('EBML', () => {
           'tag',
           {
             name: 'EBMLVersion',
-            data: Buffer.from([0x00]),
+            data: new Uint8Array([0x00]),
           },
         ])
         encoder.cork()
@@ -100,11 +99,11 @@ describe('EBML', () => {
         // );
         assert.ok(
           encoder.buffer,
-          Buffer.from([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
+          new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
         )
         encoder.uncork()
         encoder.flush()
-        expect(encoder.buffer, 'not to be a', Buffer)
+        expect(encoder.buffer, 'not to be a', Uint8Array)
       })
     })
     describe('::getSchemaInfo', () => {
@@ -191,13 +190,13 @@ describe('EBML', () => {
       })
       it('should create a new buffer (but still be empty after eval) with an empty buffer', () => {
         expect(encoder.buffer, 'to be null')
-        encoder._bufferAndFlush(Buffer.from([0x42, 0x86, 0x81, 0x01]))
+        encoder._bufferAndFlush(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
         expect(encoder.buffer, 'to be null')
       })
       it('should append to the buffer (and empty after eval) with an existing buffer', () => {
-        encoder.buffer = Buffer.from([0x42, 0x86, 0x81, 0x01])
-        expect(encoder.buffer, 'to be a', Buffer)
-        encoder._bufferAndFlush(Buffer.from([0x42, 0x86, 0x81, 0x01]))
+        encoder.buffer = new Uint8Array([0x42, 0x86, 0x81, 0x01])
+        expect(encoder.buffer, 'to be a', Uint8Array)
+        encoder._bufferAndFlush(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
         expect(encoder.buffer, 'to be null')
       })
     })
