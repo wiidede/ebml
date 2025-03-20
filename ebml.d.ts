@@ -1,6 +1,3 @@
-/// <reference types="node"/>
-import { Transform } from 'node:stream'
-
 export type TagType =
   | 'm' /* master element (contains other EBML sub-elements of the next lower level) */
   | 'u' /* unsigned integer. Some of these are UIDs, coded as 128-bit numbers */
@@ -23,7 +20,8 @@ export namespace Tag {
     b: number
   }
 }
-export interface Tag<T extends TagType> extends TagMetadata {
+
+export interface Tag<T extends keyof Tag.DataTypeToTypeMap> extends TagMetadata {
   type: T
   data: Uint8Array
   value: Tag.DataTypeToTypeMap[T]
@@ -37,6 +35,7 @@ export interface Block extends Tag<'b'> {
   /** the block's Timecode value */
   value: number
 }
+
 export interface SimpleBlock extends Block {
   /** set to `true` if the payload starts an I frame */
   keyframe: boolean
@@ -142,6 +141,7 @@ export namespace tools {
 export const schema: Map<number, EBMLTagSchema>
 
 export type EBMLTagSchema = EBMLTagSchemaBase | EBMLNumericTagSchema | EBMLStringValueTagSchema | EBMLBinaryTagSchema
+
 export interface EBMLTagSchemaBase {
   name: string
   level: number
@@ -159,17 +159,21 @@ export interface EBMLTagSchemaBase {
   maxver?: string | undefined
   i?: string | undefined
 }
+
 export interface EBMLDefaultableTagSchema extends EBMLTagSchemaBase {
   default?: any
 }
+
 export interface EBMLNumericTagSchema extends EBMLDefaultableTagSchema {
   type: 'u' | 'i' | 'f'
   range: string
   br?: string | [string, string] | [string, string, string] | [string, string, string, string] | undefined
 }
+
 export interface EBMLStringValueTagSchema extends EBMLDefaultableTagSchema {
   type: 's'
 }
+
 export interface EBMLBinaryTagSchema extends EBMLTagSchemaBase {
   bytesize?: number | undefined
 }
@@ -180,21 +184,19 @@ export type StateAndTagData =
   | ['start', TagMetadata]
   | ['end', TagMetadata]
 
-/**
- * @event 'data' `StateAndTagData`
- */
 export namespace Decoder {
-    type State = 1 /* tag */ | 2 /* size */ | 3 /* content */
+  type State = 1 /* tag */ | 2 /* size */ | 3 /* content */
 
-    interface EventListenerMap {
-      data: (chunk: StateAndTagData) => void
-      close: () => void
-      end: () => void
-      readable: () => void
-      error: (err: Error) => void
-    }
+  interface EventListenerMap {
+    data: (chunk: StateAndTagData) => void
+    close: () => void
+    end: () => void
+    readable: () => void
+    error: (err: Error) => void
+  }
 }
-export class Decoder extends Transform {
+
+export class Decoder {
   static getSchemaInfo(tag: number): EBMLTagSchema
 
   buffer: Uint8Array
@@ -202,41 +204,22 @@ export class Decoder extends Transform {
   state: Decoder.State
   tagStack: TagMetadata[]
   total: number
+  stream: TransformStream<Uint8Array, StateAndTagData>
+  mStreamEnded: boolean
+
+  constructor()
 
   readTag(): boolean
   readSize(): boolean
   readContent(): boolean
 
-  // #region Duplex methods overloadings
-
-  addListener<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
-  addListener(event: string | symbol, listener: (...args: any[]) => void): this
+  write(chunk: Uint8Array): void
+  end(): void
+  pipe<T extends WritableStream>(destination: T): T
   on<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
-  on(event: string | symbol, listener: (...args: any[]) => void): this
   once<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
-  once(event: string | symbol, listener: (...args: any[]) => void): this
-  prependListener<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
-  prependListener(event: string | symbol, listener: (...args: any[]) => void): this
-  prependOnceListener<K extends keyof Decoder.EventListenerMap>(
-    event: K,
-    listener: Decoder.EventListenerMap[K],
-  ): this
-  prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this
-  removeListener<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
-  removeListener(event: string | symbol, listener: (...args: any[]) => void): this
-
-  write(chunk: Uint8Array, encoding?: string, cb?: (error: Error | null | undefined) => void): boolean
-  write(chunk: Uint8Array, cb?: (error: Error | null | undefined) => void): boolean
-  end(cb?: () => void): this
-  end(chunk: Uint8Array, cb?: () => void): this
-  end(chunk: Uint8Array, encoding?: string, cb?: () => void): this
-
-  // #endregion
 }
 
-/**
- * Encodes a raw EBML stream
- */
 export namespace Encoder {
   interface TagStackItem {
     data: Uint8Array | null
@@ -246,23 +229,26 @@ export namespace Encoder {
     children: TagStackItem[]
   }
 }
-export class Encoder extends Transform {
-  /**
-   * gets the ID of the type of `tagName`
-   * @param tagName tag name to be looked up
-   * @return tag ID
-   */
+
+export class Encoder {
   static getSchemaInfo(tagName: string): number | null
 
   buffer: Uint8Array
   corked: boolean
   stack: Encoder.TagStackItem[]
+  stream: TransformStream<StateAndTagData, Uint8Array>
+  mStreamEnded: boolean
+
+  constructor()
 
   writeTag(tagName: TagMetadata['name'], tagData: Tag<any>['data']): void
-  /**
-   * @param tagName The name of the tag to start
-   * @param info an information object with an `end` parameter
-   */
   startTag(tagName: TagMetadata['name'], info: Pick<Encoder.TagStackItem, 'end'>): void
   endTag(): void
+  write(chunk: StateAndTagData): void
+  end(): void
+  pipe<T extends WritableStream>(destination: T): T
+  on<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
+  once<K extends keyof Decoder.EventListenerMap>(event: K, listener: Decoder.EventListenerMap[K]): this
+  cork(): void
+  uncork(): void
 }
