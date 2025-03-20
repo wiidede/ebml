@@ -2,6 +2,9 @@
 
 forked from [embl](https://github.com/node-ebml/node-ebml)
 
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+
 ## Changes
 
 - esm only
@@ -187,3 +190,7 @@ fetch('media/test.webm')
 [mkv-block]: https://www.matroska.org/technical/specs/index.html#block_structure
 [mkv-sblock]: https://www.matroska.org/technical/specs/index.html#simpleblock_structure
 [webm]: https://www.webmproject.org/
+[npm-version-src]: https://img.shields.io/npm/v/@wiidede/ebml?style=flat&colorA=080f12&colorB=1fa669
+[npm-version-href]: https://npmjs.com/package/@wiidede/e'bm'l
+[npm-downloads-src]: https://img.shields.io/npm/dm/@wiidede/ebml?style=flat&colorA=080f12&colorB=1fa669
+[npm-downloads-href]: https://npmjs.com/package/@wiidede/ebml
