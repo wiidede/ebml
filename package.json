@@ -3,69 +3,55 @@
   "type": "module",
   "version": "0.0.1",
   "packageManager": "pnpm@10.6.5",
-  "description": "ebml parser",
-  "contributors": [
-    "Chris Price <price.c@gmail.com>",
-    "Davy Van Deursen <d.vandeursen@evs.com>",
-    "Ed Markowski <siphon@protonmail.com>",
-    "Jonathan Sifuentes <jayands.dev@gmail.com>",
-    "Manuel Wiedenmann <manuel@funkensturm.de>",
-    "Mathias Buus <mathiasbuus@gmail.com>",
-    "Max Ogden <max@maxogden.com>",
-    "Morgas <https://github.com/Morgas01>",
-    "Oliver Walzer <walzer@incuray.com>",
-    "greenkeeperio-bot <support@greenkeeper.io>"
-  ],
+  "description": "ebml for web using web streams api and uint8array",
   "license": "MIT",
-  "homepage": "https://github.com/node-ebml/node-ebml#readme",
-  "repository": "github:node-ebml/node-ebml",
+  "homepage": "https://github.com/wiidede/ebml#readme",
+  "repository": "github:wiidede/ebml",
   "bugs": {
-    "url": "https://github.com/node-ebml/node-ebml/issues"
+    "url": "https://github.com/wiidede/ebml/issues"
   },
   "keywords": [
     "ebml",
     "webm",
     "mkv",
     "matroska",
-    "format"
+    "format",
+    "web-streams",
+    "uint8array"
   ],
-  "main": "lib/ebml.js",
-  "module": "lib/ebml.esm.js",
-  "browser": "src/ebml/web.js",
-  "directories": {
-    "test": "__test__",
-    "lib": "lib"
+  "exports": {
+    ".": {
+      "types": "./ebml.d.ts",
+      "import": "./dist/ebml.js"
+    }
   },
+  "types": "./ebml.d.ts",
+  "files": [
+    "dist",
+    "ebml.d.ts"
+  ],
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint",
     "build": "rollup --config",
-    "prepublishOnly": "NODE_ENV=production pnpm run build"
-  },
-  "dependencies": {
+    "clean": "rimraf dist",
+    "release": "pnpm lint && pnpm build && bumpp",
+    "prepublishOnly": "pnpm clean && pnpm build && pnpm test"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.10.1",
-    "@rollup/plugin-commonjs": "~28.0.3",
     "@rollup/plugin-json": "~6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-replace": "6.0.2",
     "@rollup/plugin-terser": "0.4.4",
-    "@types/rollup-plugin-node-builtins": "^2.1.5",
-    "@types/rollup-plugin-node-globals": "^1.4.5",
-    "check-node-version": "^4.2.1",
+    "@types/jest": "^29.5.12",
+    "bumpp": "^10.1.0",
     "eslint": "^9.22.0",
     "jest": "~29.7.0",
     "jest-html-reporter": "^4.1.0",
-    "lodash.foreach": "^4.5.0",
-    "lodash.map": "^4.6.0",
-    "lodash.range": "^3.2.0",
-    "mocha": "~11.1.0",
     "pnpm": "^10.6.5",
     "rimraf": "^6.0.1",
     "rollup": "^4.36.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-globals": "^1.4.0",
     "typescript": "^5.8.2",
     "unexpected": "^13.2.1",
     "unexpected-date": "^2.0.0"
