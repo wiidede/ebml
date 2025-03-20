@@ -60,7 +60,7 @@ export interface TagMetadata {
   dataSize: number
 }
 
-export namespace tools {
+export namespace Tools {
   /**
    * read variable length integer per
    * https://www.matroska.org/technical/specs/index.html#EBML_ex
@@ -138,7 +138,7 @@ export namespace tools {
   function readDataFromTag(tagObj: TagMetadata, data: Uint8Array): Tag<any>
 }
 
-export const schema: Map<number, EBMLTagSchema>
+export const Schema: Map<number, EBMLTagSchema>
 
 export type EBMLTagSchema = EBMLTagSchemaBase | EBMLNumericTagSchema | EBMLStringValueTagSchema | EBMLBinaryTagSchema
 
