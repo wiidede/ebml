@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "packageManager": "pnpm@10.6.5",
-  "description": "ebml for web using web streams api and uint8array",
+  "description": "An EBML parser for browser / web. ESM-only. Web Streams API. Uint8Array.",
   "license": "MIT",
   "homepage": "https://github.com/wiidede/ebml#readme",
   "repository": "github:wiidede/ebml",
@@ -17,7 +17,10 @@
     "matroska",
     "format",
     "web-streams",
-    "uint8array"
+    "uint8array",
+    "esm",
+    "browser",
+    "web-streams-api"
   ],
   "exports": {
     ".": {

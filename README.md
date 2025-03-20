@@ -5,6 +5,8 @@ forked from [embl](https://github.com/node-ebml/node-ebml)
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 
+An EBML parser for browser / web. ESM-only. Web Streams API. Uint8Array.
+
 ## Changes
 
 - esm only
