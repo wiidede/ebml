@@ -1,7 +1,7 @@
 {
   "name": "@wiidede/ebml",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "pnpm@10.6.5",
   "description": "An EBML parser for browser / web. ESM-only. Web Streams API. Uint8Array.",
   "license": "MIT",
