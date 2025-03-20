@@ -38,6 +38,12 @@ importers:
       jest-html-reporter:
         specifier: ^4.1.0
         version: 4.1.0(jest@29.7.0(@types/node@22.13.10))(typescript@5.8.2)
+      lodash.foreach:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.range:
+        specifier: ^3.2.0
+        version: 3.2.0
       pnpm:
         specifier: ^10.6.5
         version: 10.6.5
@@ -1941,8 +1947,14 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
+  lodash.foreach@4.5.0:
+    resolution: {integrity: sha512-aEXTF4d+m05rVOAUG3z4vZZ4xVexLKZGF0lIxuHZ1Hplpk/3B6Z1+/ICICYRLm7c41Z2xiejbkCkJoTlypoXhQ==}
+
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  lodash.range@3.2.0:
+    resolution: {integrity: sha512-Fgkb7SinmuzqgIhNhAElo0BL/R1rHCnhwSZf78omqSwvWqD0kD2ssOAutQonDKH/ldS8BxA72ORYI09qAY9CYg==}
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -5010,7 +5022,11 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
+  lodash.foreach@4.5.0: {}
+
   lodash.merge@4.6.2: {}
+
+  lodash.range@3.2.0: {}
 
   lodash@4.17.21: {}
 
