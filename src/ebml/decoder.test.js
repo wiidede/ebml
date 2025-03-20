@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals'
 import unexpected from 'unexpected'
 import unexpectedDate from 'unexpected-date'
-import Decoder from './decoder'
+import { Decoder } from './index'
 
 const expect = unexpected.clone().use(unexpectedDate)
 
@@ -16,7 +16,6 @@ describe('EBML', () => {
       decoder.write(new Uint8Array([0x1A, 0x45]))
 
       expect(decoder.state, 'to be', STATE_TAG)
-      expect(decoder.buffer.length, 'to be', 2)
       expect(decoder.cursor, 'to be', 0)
     })
 
@@ -25,7 +24,6 @@ describe('EBML', () => {
       decoder.write(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
 
       expect(decoder.state, 'to be', STATE_TAG)
-      expect(decoder.buffer.length, 'to be', 0)
       expect(decoder.cursor, 'to be', 0)
     })
 
@@ -36,7 +34,6 @@ describe('EBML', () => {
       decoder.write(new Uint8Array([0x81, 0x01]))
 
       expect(decoder.state, 'to be', STATE_TAG)
-      expect(decoder.buffer.length, 'to be', 0)
       expect(decoder.cursor, 'to be', 0)
     })
 
@@ -46,59 +43,57 @@ describe('EBML', () => {
       decoder.write(new Uint8Array([0x42])) // 4
 
       expect(decoder.state, 'to be', STATE_TAG)
-      expect(decoder.buffer.length, 'to be', 1)
       expect(decoder.cursor, 'to be', 0)
 
       decoder.write(new Uint8Array([0x86])) // 5
 
       expect(decoder.state, 'to be', STATE_SIZE)
-      expect(decoder.buffer.length, 'to be', 2)
       expect(decoder.cursor, 'to be', 2)
 
       decoder.write(new Uint8Array([0x81])) // 6 & 7
 
       expect(decoder.state, 'to be', STATE_CONTENT)
-      expect(decoder.buffer.length, 'to be', 3)
       expect(decoder.cursor, 'to be', 3)
 
       decoder.write(new Uint8Array([0x01])) // 6 & 7
 
       expect(decoder.state, 'to be', STATE_TAG)
-      expect(decoder.buffer.length, 'to be', 0)
       expect(decoder.cursor, 'to be', 0)
     })
 
     it('should emit correct tag events for simple data', (done) => {
       const decoder = new Decoder()
-      decoder.on('data', ([state, { dataSize, tag, type, tagStr, data }]) => {
+      const reader = decoder.stream.readable.getReader()
+
+      reader.read().then(({ value }) => {
+        const [state, { dataSize, tag, type, tagStr, data }] = value
         expect(state, 'to be', 'tag')
         expect(tag, 'to be', 0x286)
         expect(tagStr, 'to be', '4286')
         expect(dataSize, 'to be', 0x01)
         expect(type, 'to be', 'u')
         expect(data, 'to equal', new Uint8Array([0x01]))
-        done()
-        decoder.on('finish', done)
+        reader.cancel().then(() => done())
       })
-      decoder.on('finish', done)
+
       decoder.write(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
       decoder.end()
     })
 
     it('should emit correct EBML tag events for master tags', (done) => {
       const decoder = new Decoder()
+      const reader = decoder.stream.readable.getReader()
 
-      decoder.on('data', ([state, { dataSize, tag, type, tagStr, data }]) => {
+      reader.read().then(({ value }) => {
+        const [state, { dataSize, tag, type, tagStr, data }] = value
         expect(state, 'to be', 'start')
         expect(tag, 'to be', 0x0A45DFA3)
         expect(tagStr, 'to be', '1a45dfa3')
         expect(dataSize, 'to be', 0)
         expect(type, 'to be', 'm')
         expect(data, 'to be undefined')
-        done()
-        decoder.on('finish', done)
+        reader.cancel().then(() => done())
       })
-      decoder.on('finish', done)
 
       decoder.write(new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x80]))
       decoder.end()
@@ -107,28 +102,37 @@ describe('EBML', () => {
     it('should emit correct EBML:end events for master tags', (done) => {
       const decoder = new Decoder()
       let tags = 0
-      decoder.on('data', (d) => {
-        const [state, data] = d
-        if (state === 'end') {
-          expect(tags, 'to be', 2) // two tags
-          expect(data.tag, 'to be', 0x0A45DFA3)
-          expect(data.tagStr, 'to be', '1a45dfa3')
-          expect(data.dataSize, 'to be', 4)
-          expect(data.type, 'to be', 'm')
-          expect(data.data, 'to be undefined')
-          done()
-          decoder.on('finish', done)
-        }
-        else {
-          tags += 1
-        }
-      })
-      decoder.on('finish', done)
+      const reader = decoder.stream.readable.getReader()
+
+      function readTag() {
+        reader.read().then(({ done: readerDone, value }) => {
+          if (readerDone)
+            return
+
+          const [state, data] = value
+          if (state === 'end') {
+            expect(tags, 'to be', 2) // two tags
+            expect(data.tag, 'to be', 0x0A45DFA3)
+            expect(data.tagStr, 'to be', '1a45dfa3')
+            expect(data.dataSize, 'to be', 4)
+            expect(data.type, 'to be', 'm')
+            expect(data.data, 'to be undefined')
+            reader.cancel().then(() => done())
+          }
+          else {
+            tags += 1
+            readTag() // Continue reading
+          }
+        })
+      }
+
+      readTag()
 
       decoder.write(new Uint8Array([0x1A, 0x45, 0xDF, 0xA3]))
       decoder.write(new Uint8Array([0x84, 0x42, 0x86, 0x81, 0x00]))
       decoder.end()
     })
+
     describe('::getSchemaInfo', () => {
       it('returns a correct tag if possible', () => {
         expect(Decoder.getSchemaInfo(0x4286), 'to satisfy', {

@@ -1,8 +1,7 @@
-import assert from 'node:assert'
 import { beforeAll, beforeEach, describe, it } from '@jest/globals'
 import unexpected from 'unexpected'
 import unexpectedDate from 'unexpected-date'
-import Encoder from './encoder'
+import { Encoder } from './index'
 
 const expect = unexpected.clone().use(unexpectedDate)
 
@@ -10,16 +9,23 @@ describe('EBML', () => {
   describe('Encoder', () => {
     function createEncoder(expected, done) {
       const encoder = new Encoder()
-      encoder.on('data', (chunk) => {
+
+      // Use the readable stream's reader instead of 'on' event
+      const reader = encoder.stream.readable.getReader()
+
+      reader.read().then(({ value }) => {
         expect(
-          Array.from(chunk).map(b => b.toString(16).padStart(2, '0')).join(''),
+          Array.from(value).map(b => b.toString(16).padStart(2, '0')).join(''),
           'to be',
           Array.from(expected).map(b => b.toString(16).padStart(2, '0')).join(''),
         )
-        encoder.on('finish', done)
-        done()
+
+        reader.cancel().then(() => done())
+      }).catch((err) => {
+        console.error('Error in test:', err)
+        done(err)
       })
-      encoder.on('finish', done)
+
       return encoder
     }
 
@@ -34,6 +40,7 @@ describe('EBML', () => {
       ])
       encoder.end()
     })
+
     it('should write a tag with a single child', (done) => {
       const encoder = createEncoder(
         new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
@@ -48,17 +55,29 @@ describe('EBML', () => {
         },
       ])
       encoder.write(['end', { name: 'EBML' }])
-      // encoder.end();
     })
+
     describe('#cork and #uncork', () => {
-      /**
-       * @type Encoder
-       */
       let encoder
       beforeEach(() => {
         encoder = new Encoder()
       })
-      it('should block flushing when corked', () => {
+
+      it('should not emit data while corked', (done) => {
+        const reader = encoder.stream.readable.getReader()
+        let receivedData = false
+
+        setTimeout(() => {
+          expect(receivedData, 'to be', false)
+          reader.cancel().then(() => done())
+        }, 100)
+
+        reader.read().then(({ done: readerDone, value: _value }) => {
+          if (!readerDone) {
+            receivedData = true
+          }
+        })
+
         encoder.write(['start', { name: 'EBML' }])
         encoder.write([
           'tag',
@@ -67,20 +86,21 @@ describe('EBML', () => {
             data: new Uint8Array([0x00]),
           },
         ])
+
         encoder.cork()
+
         encoder.write(['end', { name: 'EBML' }])
-        encoder.flush()
-        // expect(
-        //   encoder.buffer,
-        //   'to satisfy',
-        //   Buffer.from([0x1a, 0x45, 0xdf, 0xa3, 0x84, 0x42, 0x86, 0x81, 0x00]),
-        // );
-        assert.ok(
-          encoder.buffer,
-          new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
-        )
       })
-      it('should not block flushing when uncorked', () => {
+
+      it('should emit data after uncorking', (done) => {
+        const reader = encoder.stream.readable.getReader()
+
+        reader.read().then(({ value }) => {
+          expect(value, 'to be a', Uint8Array)
+          expect(value.length, 'to be greater than', 0)
+          reader.cancel().then(() => done())
+        })
+
         encoder.write(['start', { name: 'EBML' }])
         encoder.write([
           'tag',
@@ -89,40 +109,38 @@ describe('EBML', () => {
             data: new Uint8Array([0x00]),
           },
         ])
+
         encoder.cork()
+
         encoder.write(['end', { name: 'EBML' }])
-        encoder.flush()
-        // expect(
-        //   encoder.buffer,
-        //   'to satisfy',
-        //   Buffer.from([0x1a, 0x45, 0xdf, 0xa3, 0x84, 0x42, 0x86, 0x81, 0x00]),
-        // );
-        assert.ok(
-          encoder.buffer,
-          new Uint8Array([0x1A, 0x45, 0xDF, 0xA3, 0x84, 0x42, 0x86, 0x81, 0x00]),
-        )
-        encoder.uncork()
-        encoder.flush()
-        expect(encoder.buffer, 'not to be a', Uint8Array)
+
+        setTimeout(() => {
+          encoder.uncork()
+        }, 50)
       })
     })
+
     describe('::getSchemaInfo', () => {
       it('should return a valid number when a tag is found', () => {
-        assert.ok(Encoder.getSchemaInfo('EBMLVersion'), 0x4286)
+        expect(Encoder.getSchemaInfo('EBMLVersion'), 'not to be null')
       })
+
       it('should return null when not found', () => {
-        assert.strictEqual(Encoder.getSchemaInfo('404NotFound'), null)
+        expect(Encoder.getSchemaInfo('404NotFound'), 'to be null')
       })
     })
+
     describe('#writeTag', () => {
       let encoder
       beforeAll(() => {
         encoder = new Encoder()
       })
+
       it('does nothing with invalid tag data', () => {
         encoder.writeTag('EBMLVersion', null)
         expect(encoder.stack.length, 'to equal', 0)
       })
+
       it('throws with an invalid tag name', () => {
         expect(
           () => {
@@ -133,11 +151,13 @@ describe('EBML', () => {
         )
       })
     })
+
     describe('#startTag', () => {
       let encoder
       beforeAll(() => {
         encoder = new Encoder()
       })
+
       it('throws with an invalid tag name', () => {
         expect(
           () => {
@@ -147,6 +167,7 @@ describe('EBML', () => {
           /No schema entry found/,
         )
       })
+
       it('creates a valid tag when presented', () => {
         encoder.startTag('ChapterTrackNumber', { end: -1 })
         expect(encoder.stack, 'not to be empty')
@@ -160,6 +181,7 @@ describe('EBML', () => {
             },
           ])
       })
+
       it('creates a valid tag when presented with a stack already present', () => {
         encoder.stack = [
           {
@@ -176,6 +198,7 @@ describe('EBML', () => {
         )
       })
     })
+
     describe('#_transform', () => {
       it('should do nothing on an invalid tag', () => {
         const encoder = new Encoder()
@@ -183,21 +206,38 @@ describe('EBML', () => {
         expect(encoder.buffer, 'to be null')
       })
     })
-    describe('#_bufferAndFlush', () => {
+
+    describe('#bufferAndFlush', () => {
       let encoder
       beforeEach(() => {
         encoder = new Encoder()
       })
-      it('should create a new buffer (but still be empty after eval) with an empty buffer', () => {
+
+      it('should create a new buffer with an empty buffer', (done) => {
         expect(encoder.buffer, 'to be null')
-        encoder._bufferAndFlush(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
-        expect(encoder.buffer, 'to be null')
+
+        const reader = encoder.stream.readable.getReader()
+        reader.read().then(({ value }) => {
+          expect(value, 'to be a', Uint8Array)
+          expect(Array.from(value), 'to equal', [0x42, 0x86, 0x81, 0x01])
+          reader.cancel().then(() => done())
+        })
+
+        encoder.bufferAndFlush(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
       })
-      it('should append to the buffer (and empty after eval) with an existing buffer', () => {
+
+      it('should append to the buffer with an existing buffer', (done) => {
         encoder.buffer = new Uint8Array([0x42, 0x86, 0x81, 0x01])
         expect(encoder.buffer, 'to be a', Uint8Array)
-        encoder._bufferAndFlush(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
-        expect(encoder.buffer, 'to be null')
+
+        const reader = encoder.stream.readable.getReader()
+        reader.read().then(({ value }) => {
+          expect(value, 'to be a', Uint8Array)
+          expect(Array.from(value), 'to equal', [0x42, 0x86, 0x81, 0x01, 0x42, 0x86, 0x81, 0x01])
+          reader.cancel().then(() => done())
+        })
+
+        encoder.bufferAndFlush(new Uint8Array([0x42, 0x86, 0x81, 0x01]))
       })
     })
   })

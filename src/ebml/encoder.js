@@ -1,4 +1,3 @@
-import { Transform } from 'node:stream'
 import schema from './schema'
 import tools from './tools'
 
@@ -50,13 +49,11 @@ function encodeTag(tagId, tagData, end) {
 }
 
 /**
- * Encodes a raw EBML stream
+ * Encodes a raw EBML stream using Web Streams API
  * @class EbmlEncoder
- * @extends Transform
  */
-export default class EbmlEncoder extends Transform {
-  constructor(options = {}) {
-    super({ ...options, writableObjectMode: true })
+export default class EbmlEncoder {
+  constructor() {
     /**
      * @type {Uint8Array}
      * @property {Uint8Array} mBuffer The buffer containing the encoded EBML data
@@ -77,6 +74,40 @@ export default class EbmlEncoder extends Transform {
      * @type {Array<Tag>}
      */
     this.mStack = []
+
+    /**
+     * @private
+     * @property {Function} mController The TransformStream controller
+     */
+    this.mController = null
+
+    /**
+     * @private
+     * @property {WritableStreamDefaultWriter} mWriter The stream writer
+     */
+    this.mWriter = null
+
+    /**
+     * @private
+     * @property {boolean} mStreamEnded Whether the stream has been ended
+     */
+    this.mStreamEnded = false
+
+    // Create the actual TransformStream
+    this.stream = new TransformStream({
+      start: (controller) => {
+        this.mController = controller
+      },
+      transform: (chunk) => {
+        this._transform(chunk)
+      },
+      flush: () => {
+        this._flush()
+      },
+    })
+
+    // Get the writer once at initialization
+    this.mWriter = this.stream.writable.getWriter()
   }
 
   get buffer() {
@@ -104,12 +135,146 @@ export default class EbmlEncoder extends Transform {
   }
 
   /**
-   *
-   * @param {[string, Tag]} chunk array of chunk data, starting with the tag
-   * @param {string} enc the encoding type (not used)
-   * @param {Function} done a callback method to call after the transformation
+   * Push data to the stream controller
+   * @param {any} data The data to push
    */
-  _transform(chunk, enc, done) {
+  push(data) {
+    if (this.mController) {
+      this.mController.enqueue(data)
+    }
+  }
+
+  /**
+   * Pipe method to maintain compatibility with Node.js Stream API
+   * @param {WritableStream} destination The destination stream
+   * @returns {ReadableStream} The readable part of the transform stream
+   */
+  pipe(destination) {
+    // If destination is a Node.js stream with a writable property
+    if (destination && typeof destination.write === 'function') {
+      // Create a reader from our readable stream
+      const reader = this.stream.readable.getReader()
+
+      // Read function that will be called recursively
+      const read = () => {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            // Call end if the destination supports it (Node.js stream)
+            if (typeof destination.end === 'function') {
+              destination.end()
+            }
+            return
+          }
+
+          // Write to the destination
+          destination.write(value)
+
+          // Continue reading
+          read()
+        }).catch((err) => {
+          // If destination has an error method (Node.js stream)
+          if (typeof destination.emit === 'function') {
+            destination.emit('error', err)
+          }
+        })
+      }
+
+      // Start reading
+      read()
+    }
+    else {
+      // For Web Streams, just return the readable part so it can be piped again
+      this.stream.readable.pipeTo(destination).catch((err) => {
+        console.error('Error piping stream:', err)
+      })
+    }
+
+    return destination
+  }
+
+  /**
+   * Write data to the stream
+   * @param {any} chunk The data to write
+   */
+  write(chunk) {
+    if (this.mStreamEnded) {
+      throw new Error('Cannot write after end')
+    }
+
+    // Just forward to internal _transform directly instead of using the writer
+    // This avoids stream locking issues when write is called multiple times
+    this._transform(chunk)
+  }
+
+  /**
+   * End the stream
+   */
+  end() {
+    if (this.mStreamEnded) {
+      return
+    }
+
+    // Make sure any pending data is flushed
+    this._flush()
+
+    this.mStreamEnded = true
+
+    // Only close the writer once at the end
+    this.mWriter.close().catch((err) => {
+      console.error('Error closing stream:', err)
+    })
+  }
+
+  /**
+   * Register event listener (for Node.js Stream API compatibility)
+   * @param {string} event The event name
+   * @param {Function} callback The callback function
+   */
+  on(event, callback) {
+    if (event === 'data') {
+      const reader = this.stream.readable.getReader()
+      const read = () => {
+        reader.read().then(({ done, value }) => {
+          if (done)
+            return
+          callback(value)
+          read()
+        }).catch((err) => {
+          console.error('Error reading from stream:', err)
+        })
+      }
+      read()
+    }
+    // Return this for chaining
+    return this
+  }
+
+  /**
+   * Register one-time event listener (for Node.js Stream API compatibility)
+   * @param {string} event The event name
+   * @param {Function} callback The callback function
+   */
+  once(event, callback) {
+    if (event === 'data') {
+      const reader = this.stream.readable.getReader()
+      reader.read().then(({ done, value }) => {
+        if (!done)
+          callback(value)
+        reader.releaseLock()
+      }).catch((err) => {
+        console.error('Error reading from stream:', err)
+      })
+    }
+    // Return this for chaining
+    return this
+  }
+
+  /**
+   * Transform method that processes chunks of data
+   * @private
+   * @param {[string, object]} chunk The chunk to process
+   */
+  _transform(chunk) {
     const [tag, { data, name, ...rest }] = chunk
 
     switch (tag) {
@@ -125,8 +290,14 @@ export default class EbmlEncoder extends Transform {
       default:
         break
     }
+  }
 
-    return done()
+  /**
+   * Flush any remaining data
+   * @private
+   */
+  _flush() {
+    this.flush()
   }
 
   /**
@@ -155,14 +326,6 @@ export default class EbmlEncoder extends Transform {
   bufferAndFlush(buffer) {
     this.buffer = tools.concatenate(this.buffer, buffer)
     this.flush()
-  }
-
-  _flush(done = () => {}) {
-    this.flush(done)
-  }
-
-  _bufferAndFlush(buffer) {
-    this.bufferAndFlush(buffer)
   }
 
   /**

@@ -21,14 +21,36 @@ describe('ebml', () => {
         0x00,
       ])
 
-      encoder.once('data', (chunk) => {
+      // Connect the decoder to the encoder using reader and writer directly
+      const decoderOutput = []
+
+      // We'll read from the decoder and manually write to the encoder
+      const reader = decoder.stream.readable.getReader()
+
+      function processDecoderOutput() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            encoder.end()
+            return
+          }
+
+          decoderOutput.push(value)
+          encoder.write(value)
+          processDecoderOutput()
+        })
+      }
+
+      // Listen to encoder output
+      const encoderReader = encoder.stream.readable.getReader()
+      encoderReader.read().then(({ value: chunk }) => {
         const chunkHex = Array.from(chunk).map(b => b.toString(16).padStart(2, '0')).join('')
         const bufferHex = Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('')
         expect(chunkHex, 'to equal', bufferHex)
         done()
       })
 
-      decoder.pipe(encoder)
+      // Start the process
+      processDecoderOutput()
       decoder.write(buffer)
       decoder.end()
     })
@@ -37,6 +59,64 @@ describe('ebml', () => {
       const decoder = new Decoder()
       const encoder = new Encoder()
 
+      // We'll write directly to the encoder and read from the decoder
+      // instead of using pipeTo which may lock the streams
+      const onDecoderData = []
+      let testFinished = false
+
+      // Read from decoder stream
+      const decoderReader = decoder.stream.readable.getReader()
+
+      function processDecoderOutput() {
+        decoderReader.read().then(({ done: readerDone, value }) => {
+          if (readerDone || testFinished) {
+            return
+          }
+
+          onDecoderData.push(value)
+
+          // When we get cluster data, do the checks and finish the test
+          if (value[1].name === 'Cluster') {
+            expect(value[1].name, 'to be', 'Cluster')
+            // FIXME Skip checking start position since it depends on actual byte position
+            // expect(value[1].start, 'to be', 0)
+            expect(value[1].end, 'to be', -1)
+            testFinished = true
+            done()
+            return
+          }
+
+          // Continue reading
+          processDecoderOutput()
+        }).catch((err) => {
+          console.error('Error in processDecoderOutput:', err)
+          if (!testFinished) {
+            testFinished = true
+            done(err)
+          }
+        })
+      }
+
+      // Listen to encoder output
+      const encoderReader = encoder.stream.readable.getReader()
+
+      function forwardToDecoder() {
+        encoderReader.read().then(({ done, value }) => {
+          if (done) {
+            decoder.end()
+            return
+          }
+
+          decoder.write(value)
+          forwardToDecoder()
+        })
+      }
+
+      // Start the processes
+      processDecoderOutput()
+      forwardToDecoder()
+
+      // Write to encoder
       encoder.write([
         'start',
         {
@@ -53,16 +133,6 @@ describe('ebml', () => {
           end: -1,
         },
       ])
-
-      const pipeline = encoder.pipe(decoder)
-      pipeline.once('data', (data) => {
-        expect(data[1].name, 'to be', 'Cluster')
-        // FIXME Skip checking start position since it depends on actual byte position
-        // expect(data[1].start, 'to be', 0)
-        expect(data[1].end, 'to be', -1)
-        done()
-      })
-
       encoder.end()
     })
   })

@@ -1,5 +1,3 @@
-// import { Buffer } from 'buffer'
-
 export default class Tools {
   /**
    * read variable length integer per

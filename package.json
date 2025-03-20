@@ -31,6 +31,7 @@
   ],
   "main": "lib/ebml.js",
   "module": "lib/ebml.esm.js",
+  "browser": "src/ebml/web.js",
   "directories": {
     "test": "__test__",
     "lib": "lib"

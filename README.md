@@ -7,10 +7,12 @@ forked from [embl](https://github.com/node-ebml/node-ebml)
 - esm only
 - remove debug
 - remove buffer using Uint8Array
+- Web Streams API instead of Node.js streams
+- Web-first API design
 
 ---
 
-# EBML [![NPM](https://nodei.co/npm/ebml.png?compact=true)](https://www.npmjs.com/package/ebml) [![Coverage Status](https://codecov.io/gh/node-ebml/node-ebml/branch/master/graph/badge.svg)](https://codecov.io/gh/node-ebml/node-ebml) [![Greenkeeper badge](https://badges.greenkeeper.io/node-ebml/node-ebml.svg)](https://greenkeeper.io/)
+# EBML
 
 [EBML][ebml] stands for Extensible Binary Meta-Language and is somewhat of a
 binary version of XML. It's used for container formats like [WebM][webm] or
@@ -18,28 +20,19 @@ binary version of XML. It's used for container formats like [WebM][webm] or
 
 ## Note
 
-this version fixes just the encoder
+This version completely modernizes the original library, using Web Streams API and ESM.
 
 ---
 
-This is for version `3.0.0` and up, which has undergone a _massive_ rewrite and
-now builds with [RollupJS][rollup].
-
-Version `2.2.4` is the last version to have guaranteed legacy semantics.
-
 # Install
 
-Install via NPM or Yarn:
-
 ```bash
-npm install ebml --save
-# or
-yarn add ebml
+pnpm add @wiidede/ebml
 ```
 
 # Usage
 
-The `Decoder()` class is implemented as a [Node Transform stream][node-stream-transform].
+The `Decoder()` class is implemented using the [Web Streams API](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API).
 As input it takes EBML. As output it emits a sequence of chunks: two-element
 arrays looking like this example.
 
@@ -86,81 +79,111 @@ And the `value` member shows the block's Timecode value.
 
 # Examples
 
-This example reads a media file into memory and decodes it. The `decoder`
-invokes its `data` event for each Element.
+This example reads a media file using the Fetch API and decodes it. The `decoder`
+processes the chunks as they arrive.
 
 ```js
-const fs = require('node:fs')
-const { Decoder } = require('./lib/ebml.js')
+import { Decoder } from '@wiidede/ebml'
 
 const decoder = new Decoder()
 
-decoder.on('data', chunk => console.log(chunk))
+// Using the readable stream's reader
+const reader = decoder.stream.readable.getReader()
 
-fs.readFile('media/test.webm', (err, data) => {
-  if (err) {
-    throw err
-  }
-  decoder.write(data)
+reader.read().then(function processChunk({ done, value }) {
+  if (done)
+    return
+
+  console.log(value)
+
+  // Continue reading
+  reader.read().then(processChunk)
 })
+
+// Fetch the file and pipe to decoder
+fetch('media/test.webm')
+  .then((response) => {
+    if (!response.ok)
+      throw new Error(`HTTP error! Status: ${response.status}`)
+
+    // Get a reader for the response body stream
+    const reader = response.body.getReader()
+
+    // Read the data
+    reader.read().then(function processData({ done, value }) {
+      if (done) {
+        decoder.end()
+        return
+      }
+
+      // Feed chunk to decoder
+      decoder.write(value)
+
+      // Continue reading
+      return reader.read().then(processData)
+    })
+  })
+  .catch(error => console.error('Fetch error:', error))
 ```
 
-This example does the same thing, but by piping the file stream into the decoder (a Transform stream).
+This example counts tag occurrences using Web Streams API:
 
 ```js
-const { Decoder } = require('./lib/ebml.js')
+import { Decoder } from '@wiidede/ebml'
 
 const ebmlDecoder = new Decoder()
 const counts = {}
 
-require('node:fs')
-  .createReadStream('media/test.webm')
-  .pipe(ebmlDecoder)
-  .on('data', (chunk) => {
-    const { name } = chunk[1]
-    if (!counts[name]) {
-      counts[name] = 0
-    }
-    counts[name] += 1
+// Fetch the file
+fetch('media/test.webm')
+  .then((response) => {
+    if (!response.ok)
+      throw new Error(`HTTP error! Status: ${response.status}`)
+
+    // Create a reader for the decoder output
+    const reader = ebmlDecoder.stream.readable.getReader()
+
+    // Process decoded chunks
+    reader.read().then(function processOutput({ done, value }) {
+      if (done) {
+        console.log(counts)
+        return
+      }
+
+      const { name } = value[1]
+      if (!counts[name]) {
+        counts[name] = 0
+      }
+      counts[name] += 1
+
+      // Continue reading
+      return reader.read().then(processOutput)
+    })
+
+    // Pipe response body to decoder
+    const responseReader = response.body.getReader()
+
+    responseReader.read().then(function processInput({ done, value }) {
+      if (done) {
+        ebmlDecoder.end()
+        return
+      }
+
+      ebmlDecoder.write(value)
+      return responseReader.read().then(processInput)
+    })
   })
-  .on('finish', () => console.log(counts))
+  .catch(error => console.error('Fetch error:', error))
 ```
 
-# State of this project
+# Thanks
 
-Parsing should work. If it doesn't, please create [an issue][new-issue].
-
-`d`-type elements (timestamps) are not yet decoded to Javascript timestamp
-values.
-
-Thanks to @chrisprice we got an encoder!
-
-# License
-
-[MIT](./LICENSE)
-
-# Contributors
-
-(in alphabetical order)
-
-- [Chris Price](https://github.com/chrisprice)
-- [Davy Van Deursen](https://github.com/dvdeurse)
-- [Ed Markowski](https://github.com/siphontv)
-- [Jonathan Sifuentes](https://github.com/jayands)
-- [Manuel Wiedenmann](https://github.com/fsmanuel)
-- [Mark Schmale](https://github.com/themasch)
-- [Mathias Buus](https://github.com/mafintosh)
-- [Max Ogden](https://github.com/maxogden)
-- [Morgas](https://github.com/Morgas01)
-- [Oliver Jones](https://github.com/OllieJones)
-- [Oliver Walzer](https://github.com/owcd)
+- [embl](https://github.com/node-ebml/node-ebml)
+- Claude & cursor
 
 [ebml]: http://ebml.sourceforge.net/
-[new-issue]: https://github.com/node-ebml/node-ebml/issues/new
 [mdn-uint8array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-[node-stream-transform]: https://nodejs.org/api/stream.html#stream_class_stream_transform
 [mkv]: http://www.matroska.org/technical/specs/index.html
-[rollup]: https://rollupjs.org/
 [mkv-block]: https://www.matroska.org/technical/specs/index.html#block_structure
 [mkv-sblock]: https://www.matroska.org/technical/specs/index.html#simpleblock_structure
 [webm]: https://www.webmproject.org/
