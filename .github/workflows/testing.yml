@@ -1,28 +1,33 @@
-name: Node-EBML Tests
+name: CI
+
 on:
   push:
-    branches: [master]
+    branches:
+      - main
+
   pull_request:
-    branches: [master]
+    branches:
+      - main
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [6.x, 8.x, 10.x]
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        run: npm install -g codecov
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-      - run: yarn build
-      - run: yarn test
-      - run: codecov
+      - uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+
+      - name: Set node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install
+        run: pnpm i
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test

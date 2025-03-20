@@ -196,7 +196,7 @@ const schema = new Map([
       default: 'matroska',
       minver: 1,
       description:
-        "A string that describes the type of document that follows this EBML header. 'matroska' in our case or 'webm' for webm files.",
+        'A string that describes the type of document that follows this EBML header. \'matroska\' in our case or \'webm\' for webm files.',
       multiple: false,
       webm: false,
     },
@@ -417,7 +417,7 @@ const schema = new Map([
       range: 'not 0',
       br: ['', '', ''],
       description:
-        "A bit field that describes which elements have been modified in this way. Values (big endian) can be OR'ed. Possible values: 1 - all frame contents, 2 - the track's private data, 4 - the next ContentEncoding (next ContentEncodingOrder. Either the data inside ContentCompression and/or ContentEncryption)",
+        'A bit field that describes which elements have been modified in this way. Values (big endian) can be OR\'ed. Possible values: 1 - all frame contents, 2 - the track\'s private data, 4 - the next ContentEncoding (next ContentEncodingOrder. Either the data inside ContentCompression and/or ContentEncryption)',
       multiple: false,
     },
   ],
@@ -710,7 +710,7 @@ const schema = new Map([
     },
   ],
   [
-    0x447a,
+    0x447A,
     {
       name: 'TagLanguage',
       level: 4,
@@ -724,7 +724,7 @@ const schema = new Map([
     },
   ],
   [
-    0x45a3,
+    0x45A3,
     {
       name: 'TagName',
       level: 4,
@@ -736,7 +736,7 @@ const schema = new Map([
     },
   ],
   [
-    0x67c8,
+    0x67C8,
     {
       name: 'SimpleTag',
       cppname: 'TagSimple',
@@ -751,7 +751,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63c6,
+    0x63C6,
     {
       name: 'TagAttachmentUID',
       level: 4,
@@ -765,7 +765,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63c4,
+    0x63C4,
     {
       name: 'TagChapterUID',
       level: 4,
@@ -779,7 +779,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63c9,
+    0x63C9,
     {
       name: 'TagEditionUID',
       level: 4,
@@ -793,7 +793,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63c5,
+    0x63C5,
     {
       name: 'TagTrackUID',
       level: 4,
@@ -807,7 +807,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63ca,
+    0x63CA,
     {
       name: 'TargetType',
       cppname: 'TagTargetType',
@@ -821,7 +821,7 @@ const schema = new Map([
     },
   ],
   [
-    0x68ca,
+    0x68CA,
     {
       name: 'TargetTypeValue',
       cppname: 'TagTargetTypeValue',
@@ -835,7 +835,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63c0,
+    0x63C0,
     {
       name: 'Targets',
       cppname: 'TagTargets',
@@ -849,7 +849,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1254c367,
+    0x1254C367,
     {
       name: 'Tags',
       level: 1,
@@ -862,7 +862,7 @@ const schema = new Map([
     },
   ],
   [
-    0x450d,
+    0x450D,
     {
       name: 'ChapProcessPrivate',
       cppname: 'ChapterProcessPrivate',
@@ -875,7 +875,7 @@ const schema = new Map([
     },
   ],
   [
-    0x437e,
+    0x437E,
     {
       name: 'ChapCountry',
       cppname: 'ChapterCountry',
@@ -889,7 +889,7 @@ const schema = new Map([
     },
   ],
   [
-    0x437c,
+    0x437C,
     {
       name: 'ChapLanguage',
       cppname: 'ChapterLanguage',
@@ -905,7 +905,7 @@ const schema = new Map([
     },
   ],
   [
-    0x8f,
+    0x8F,
     {
       name: 'ChapterTrack',
       level: 4,
@@ -917,7 +917,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63c3,
+    0x63C3,
     {
       name: 'ChapterPhysicalEquiv',
       level: 4,
@@ -929,7 +929,7 @@ const schema = new Map([
     },
   ],
   [
-    0x6ebc,
+    0x6EBC,
     {
       name: 'ChapterSegmentEditionUID',
       level: 4,
@@ -942,7 +942,7 @@ const schema = new Map([
     },
   ],
   [
-    0x6e67,
+    0x6E67,
     {
       name: 'ChapterSegmentUID',
       level: 4,
@@ -956,7 +956,7 @@ const schema = new Map([
     },
   ],
   [
-    0x73c4,
+    0x73C4,
     {
       name: 'ChapterUID',
       level: 4,
@@ -969,7 +969,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb6,
+    0xB6,
     {
       name: 'ChapterAtom',
       level: 3,
@@ -984,7 +984,7 @@ const schema = new Map([
     },
   ],
   [
-    0x45dd,
+    0x45DD,
     {
       name: 'EditionFlagOrdered',
       level: 3,
@@ -998,7 +998,7 @@ const schema = new Map([
     },
   ],
   [
-    0x45db,
+    0x45DB,
     {
       name: 'EditionFlagDefault',
       level: 3,
@@ -1013,7 +1013,7 @@ const schema = new Map([
     },
   ],
   [
-    0x45bd,
+    0x45BD,
     {
       name: 'EditionFlagHidden',
       level: 3,
@@ -1028,7 +1028,7 @@ const schema = new Map([
     },
   ],
   [
-    0x45bc,
+    0x45BC,
     {
       name: 'EditionUID',
       level: 3,
@@ -1037,11 +1037,11 @@ const schema = new Map([
       webm: false,
       range: 'not 0',
       description:
-        "A unique ID to identify the edition. It's useful for tagging an edition.",
+        'A unique ID to identify the edition. It\'s useful for tagging an edition.',
     },
   ],
   [
-    0x45b9,
+    0x45B9,
     {
       name: 'EditionEntry',
       level: 2,
@@ -1054,7 +1054,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1043a770,
+    0x1043A770,
     {
       name: 'Chapters',
       level: 1,
@@ -1066,7 +1066,7 @@ const schema = new Map([
     },
   ],
   [
-    0x46ae,
+    0x46AE,
     {
       name: 'FileUID',
       level: 3,
@@ -1079,7 +1079,7 @@ const schema = new Map([
     },
   ],
   [
-    0x465c,
+    0x465C,
     {
       name: 'FileData',
       level: 3,
@@ -1091,7 +1091,7 @@ const schema = new Map([
     },
   ],
   [
-    0x466e,
+    0x466E,
     {
       name: 'FileName',
       level: 3,
@@ -1103,7 +1103,7 @@ const schema = new Map([
     },
   ],
   [
-    0x467e,
+    0x467E,
     {
       name: 'FileDescription',
       level: 3,
@@ -1114,7 +1114,7 @@ const schema = new Map([
     },
   ],
   [
-    0x61a7,
+    0x61A7,
     {
       name: 'AttachedFile',
       level: 2,
@@ -1127,7 +1127,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1941a469,
+    0x1941A469,
     {
       name: 'Attachments',
       level: 1,
@@ -1138,7 +1138,7 @@ const schema = new Map([
     },
   ],
   [
-    0xeb,
+    0xEB,
     {
       name: 'CueRefCodecState',
       level: 5,
@@ -1150,7 +1150,7 @@ const schema = new Map([
     },
   ],
   [
-    0x535f,
+    0x535F,
     {
       name: 'CueRefNumber',
       level: 5,
@@ -1163,7 +1163,7 @@ const schema = new Map([
     },
   ],
   [
-    0xdb,
+    0xDB,
     {
       name: 'CueReference',
       level: 4,
@@ -1175,7 +1175,7 @@ const schema = new Map([
     },
   ],
   [
-    0xea,
+    0xEA,
     {
       name: 'CueCodecState',
       level: 4,
@@ -1188,7 +1188,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb2,
+    0xB2,
     {
       name: 'CueDuration',
       level: 4,
@@ -1197,11 +1197,11 @@ const schema = new Map([
       minver: 4,
       webm: false,
       description:
-        "The duration of the block according to the segment time base. If missing the track's DefaultDuration does not apply and no duration information is available in terms of the cues.",
+        'The duration of the block according to the segment time base. If missing the track\'s DefaultDuration does not apply and no duration information is available in terms of the cues.',
     },
   ],
   [
-    0xf0,
+    0xF0,
     {
       name: 'CueRelativePosition',
       level: 4,
@@ -1214,7 +1214,7 @@ const schema = new Map([
     },
   ],
   [
-    0xf1,
+    0xF1,
     {
       name: 'CueClusterPosition',
       level: 4,
@@ -1225,7 +1225,7 @@ const schema = new Map([
     },
   ],
   [
-    0xf7,
+    0xF7,
     {
       name: 'CueTrack',
       level: 4,
@@ -1237,7 +1237,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb7,
+    0xB7,
     {
       name: 'CueTrackPositions',
       level: 3,
@@ -1250,7 +1250,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb3,
+    0xB3,
     {
       name: 'CueTime',
       level: 3,
@@ -1261,7 +1261,7 @@ const schema = new Map([
     },
   ],
   [
-    0xbb,
+    0xBB,
     {
       name: 'CuePoint',
       level: 2,
@@ -1274,7 +1274,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1c53bb6b,
+    0x1C53BB6B,
     {
       name: 'Cues',
       level: 1,
@@ -1285,7 +1285,7 @@ const schema = new Map([
     },
   ],
   [
-    0x47e6,
+    0x47E6,
     {
       name: 'ContentSigHashAlgo',
       level: 6,
@@ -1295,11 +1295,11 @@ const schema = new Map([
       default: 0,
       br: ['', ''],
       description:
-        "The hash algorithm used for the signature. A value of '0' means that the contents have not been signed but only encrypted. Predefined values: 1 - SHA1-160 2 - MD5",
+        'The hash algorithm used for the signature. A value of \'0\' means that the contents have not been signed but only encrypted. Predefined values: 1 - SHA1-160 2 - MD5',
     },
   ],
   [
-    0x47e5,
+    0x47E5,
     {
       name: 'ContentSigAlgo',
       level: 6,
@@ -1309,11 +1309,11 @@ const schema = new Map([
       default: 0,
       br: '',
       description:
-        "The algorithm used for the signature. A value of '0' means that the contents have not been signed but only encrypted. Predefined values: 1 - RSA",
+        'The algorithm used for the signature. A value of \'0\' means that the contents have not been signed but only encrypted. Predefined values: 1 - RSA',
     },
   ],
   [
-    0x47e4,
+    0x47E4,
     {
       name: 'ContentSigKeyID',
       level: 6,
@@ -1325,7 +1325,7 @@ const schema = new Map([
     },
   ],
   [
-    0x47e3,
+    0x47E3,
     {
       name: 'ContentSignature',
       level: 6,
@@ -1336,7 +1336,7 @@ const schema = new Map([
     },
   ],
   [
-    0x47e2,
+    0x47E2,
     {
       name: 'ContentEncKeyID',
       level: 6,
@@ -1348,7 +1348,7 @@ const schema = new Map([
     },
   ],
   [
-    0x47e1,
+    0x47E1,
     {
       name: 'ContentEncAlgo',
       level: 6,
@@ -1358,11 +1358,11 @@ const schema = new Map([
       default: 0,
       br: '',
       description:
-        "The encryption algorithm used. The value '0' means that the contents have not been encrypted but only signed. Predefined values: 1 - DES, 2 - 3DES, 3 - Twofish, 4 - Blowfish, 5 - AES",
+        'The encryption algorithm used. The value \'0\' means that the contents have not been encrypted but only signed. Predefined values: 1 - DES, 2 - 3DES, 3 - Twofish, 4 - Blowfish, 5 - AES',
     },
   ],
   [
-    0x6d80,
+    0x6D80,
     {
       name: 'ContentEncodings',
       level: 3,
@@ -1374,7 +1374,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc4,
+    0xC4,
     {
       name: 'TrickMasterTrackSegmentUID',
       level: 3,
@@ -1385,7 +1385,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc7,
+    0xC7,
     {
       name: 'TrickMasterTrackUID',
       level: 3,
@@ -1395,7 +1395,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc6,
+    0xC6,
     {
       name: 'TrickTrackFlag',
       level: 3,
@@ -1406,7 +1406,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc1,
+    0xC1,
     {
       name: 'TrickTrackSegmentUID',
       level: 3,
@@ -1417,7 +1417,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc0,
+    0xC0,
     {
       name: 'TrickTrackUID',
       level: 3,
@@ -1427,7 +1427,7 @@ const schema = new Map([
     },
   ],
   [
-    0xed,
+    0xED,
     {
       name: 'TrackJoinUID',
       level: 5,
@@ -1442,7 +1442,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe9,
+    0xE9,
     {
       name: 'TrackJoinBlocks',
       level: 4,
@@ -1454,7 +1454,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe6,
+    0xE6,
     {
       name: 'TrackPlaneType',
       level: 6,
@@ -1467,7 +1467,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe5,
+    0xE5,
     {
       name: 'TrackPlaneUID',
       level: 6,
@@ -1480,7 +1480,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe4,
+    0xE4,
     {
       name: 'TrackPlane',
       level: 5,
@@ -1494,7 +1494,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe3,
+    0xE3,
     {
       name: 'TrackCombinePlanes',
       level: 4,
@@ -1506,7 +1506,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe2,
+    0xE2,
     {
       name: 'TrackOperation',
       level: 3,
@@ -1518,7 +1518,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7d7b,
+    0x7D7B,
     {
       name: 'ChannelPositions',
       cppname: 'AudioPosition',
@@ -1530,7 +1530,7 @@ const schema = new Map([
     },
   ],
   [
-    0x9f,
+    0x9F,
     {
       name: 'Channels',
       cppname: 'AudioChannels',
@@ -1544,7 +1544,7 @@ const schema = new Map([
     },
   ],
   [
-    0x78b5,
+    0x78B5,
     {
       name: 'OutputSamplingFrequency',
       cppname: 'AudioOutputSamplingFreq',
@@ -1558,7 +1558,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb5,
+    0xB5,
     {
       name: 'SamplingFrequency',
       cppname: 'AudioSamplingFreq',
@@ -1572,7 +1572,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe1,
+    0xE1,
     {
       name: 'Audio',
       cppname: 'TrackAudio',
@@ -1583,7 +1583,7 @@ const schema = new Map([
     },
   ],
   [
-    0x2383e3,
+    0x2383E3,
     {
       name: 'FrameRate',
       cppname: 'VideoFrameRate',
@@ -1595,7 +1595,7 @@ const schema = new Map([
     },
   ],
   [
-    0x2fb523,
+    0x2FB523,
     {
       name: 'GammaValue',
       cppname: 'VideoGamma',
@@ -1607,7 +1607,7 @@ const schema = new Map([
     },
   ],
   [
-    0x2eb524,
+    0x2EB524,
     {
       name: 'ColourSpace',
       cppname: 'VideoColourSpace',
@@ -1620,7 +1620,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54b3,
+    0x54B3,
     {
       name: 'AspectRatioType',
       cppname: 'VideoAspectRatio',
@@ -1633,7 +1633,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54b2,
+    0x54B2,
     {
       name: 'DisplayUnit',
       cppname: 'VideoDisplayUnit',
@@ -1646,7 +1646,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54ba,
+    0x54BA,
     {
       name: 'DisplayHeight',
       cppname: 'VideoDisplayHeight',
@@ -1660,7 +1660,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54b0,
+    0x54B0,
     {
       name: 'DisplayWidth',
       cppname: 'VideoDisplayWidth',
@@ -1674,7 +1674,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54dd,
+    0x54DD,
     {
       name: 'PixelCropRight',
       cppname: 'VideoPixelCropRight',
@@ -1687,7 +1687,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54cc,
+    0x54CC,
     {
       name: 'PixelCropLeft',
       cppname: 'VideoPixelCropLeft',
@@ -1700,7 +1700,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54bb,
+    0x54BB,
     {
       name: 'PixelCropTop',
       cppname: 'VideoPixelCropTop',
@@ -1713,7 +1713,7 @@ const schema = new Map([
     },
   ],
   [
-    0x54aa,
+    0x54AA,
     {
       name: 'PixelCropBottom',
       cppname: 'VideoPixelCropBottom',
@@ -1726,7 +1726,7 @@ const schema = new Map([
     },
   ],
   [
-    0xba,
+    0xBA,
     {
       name: 'PixelHeight',
       cppname: 'VideoPixelHeight',
@@ -1739,7 +1739,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb0,
+    0xB0,
     {
       name: 'PixelWidth',
       cppname: 'VideoPixelWidth',
@@ -1752,7 +1752,7 @@ const schema = new Map([
     },
   ],
   [
-    0x53b9,
+    0x53B9,
     {
       name: 'OldStereoMode',
       level: 4,
@@ -1765,7 +1765,7 @@ const schema = new Map([
     },
   ],
   [
-    0x53c0,
+    0x53C0,
     {
       name: 'AlphaMode',
       cppname: 'VideoAlphaMode',
@@ -1779,7 +1779,7 @@ const schema = new Map([
     },
   ],
   [
-    0x53b8,
+    0x53B8,
     {
       name: 'StereoMode',
       cppname: 'VideoStereoMode',
@@ -1793,7 +1793,7 @@ const schema = new Map([
     },
   ],
   [
-    0x9a,
+    0x9A,
     {
       name: 'FlagInterlaced',
       cppname: 'VideoFlagInterlaced',
@@ -1808,7 +1808,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe0,
+    0xE0,
     {
       name: 'Video',
       cppname: 'TrackVideo',
@@ -1819,7 +1819,7 @@ const schema = new Map([
     },
   ],
   [
-    0x66a5,
+    0x66A5,
     {
       name: 'TrackTranslateTrackID',
       level: 4,
@@ -1832,7 +1832,7 @@ const schema = new Map([
     },
   ],
   [
-    0x66bf,
+    0x66BF,
     {
       name: 'TrackTranslateCodec',
       level: 4,
@@ -1845,7 +1845,7 @@ const schema = new Map([
     },
   ],
   [
-    0x66fc,
+    0x66FC,
     {
       name: 'TrackTranslateEditionUID',
       level: 4,
@@ -1858,7 +1858,7 @@ const schema = new Map([
     },
   ],
   [
-    0x56bb,
+    0x56BB,
     {
       name: 'SeekPreRoll',
       level: 3,
@@ -1873,7 +1873,7 @@ const schema = new Map([
     },
   ],
   [
-    0x56aa,
+    0x56AA,
     {
       name: 'CodecDelay',
       level: 3,
@@ -1887,7 +1887,7 @@ const schema = new Map([
     },
   ],
   [
-    0x6fab,
+    0x6FAB,
     {
       name: 'TrackOverlay',
       level: 3,
@@ -1900,7 +1900,7 @@ const schema = new Map([
     },
   ],
   [
-    0xaa,
+    0xAA,
     {
       name: 'CodecDecodeAll',
       level: 3,
@@ -1914,7 +1914,7 @@ const schema = new Map([
     },
   ],
   [
-    0x26b240,
+    0x26B240,
     {
       name: 'CodecDownloadURL',
       level: 3,
@@ -1925,7 +1925,7 @@ const schema = new Map([
     },
   ],
   [
-    0x3b4040,
+    0x3B4040,
     {
       name: 'CodecInfoURL',
       level: 3,
@@ -1936,7 +1936,7 @@ const schema = new Map([
     },
   ],
   [
-    0x3a9697,
+    0x3A9697,
     {
       name: 'CodecSettings',
       level: 3,
@@ -1946,7 +1946,7 @@ const schema = new Map([
     },
   ],
   [
-    0x63a2,
+    0x63A2,
     {
       name: 'CodecPrivate',
       level: 3,
@@ -1956,7 +1956,7 @@ const schema = new Map([
     },
   ],
   [
-    0x22b59c,
+    0x22B59C,
     {
       name: 'Language',
       cppname: 'TrackLanguage',
@@ -1969,7 +1969,7 @@ const schema = new Map([
     },
   ],
   [
-    0x536e,
+    0x536E,
     {
       name: 'Name',
       cppname: 'TrackName',
@@ -1980,7 +1980,7 @@ const schema = new Map([
     },
   ],
   [
-    0x55ee,
+    0x55EE,
     {
       name: 'MaxBlockAdditionID',
       level: 3,
@@ -1993,7 +1993,7 @@ const schema = new Map([
     },
   ],
   [
-    0x537f,
+    0x537F,
     {
       name: 'TrackOffset',
       level: 3,
@@ -2001,11 +2001,11 @@ const schema = new Map([
       webm: false,
       default: 0,
       description:
-        "A value to add to the Block's Timestamp. This can be used to adjust the playback offset of a track.",
+        'A value to add to the Block\'s Timestamp. This can be used to adjust the playback offset of a track.',
     },
   ],
   [
-    0x23314f,
+    0x23314F,
     {
       name: 'TrackTimecodeScale',
       level: 3,
@@ -2021,7 +2021,7 @@ const schema = new Map([
     },
   ],
   [
-    0x234e7a,
+    0x234E7A,
     {
       name: 'DefaultDecodedFieldDuration',
       cppname: 'TrackDefaultDecodedFieldDuration',
@@ -2034,7 +2034,7 @@ const schema = new Map([
     },
   ],
   [
-    0x23e383,
+    0x23E383,
     {
       name: 'DefaultDuration',
       cppname: 'TrackDefaultDuration',
@@ -2043,11 +2043,11 @@ const schema = new Map([
       minver: 1,
       range: 'not 0',
       description:
-        "Number of nanoseconds (not scaled via TimecodeScale) per frame ('frame' in the Matroska sense -- one element put into a (Simple)Block).",
+        'Number of nanoseconds (not scaled via TimecodeScale) per frame (\'frame\' in the Matroska sense -- one element put into a (Simple)Block).',
     },
   ],
   [
-    0x6df8,
+    0x6DF8,
     {
       name: 'MaxCache',
       cppname: 'TrackMaxCache',
@@ -2060,7 +2060,7 @@ const schema = new Map([
     },
   ],
   [
-    0x6de7,
+    0x6DE7,
     {
       name: 'MinCache',
       cppname: 'TrackMinCache',
@@ -2075,7 +2075,7 @@ const schema = new Map([
     },
   ],
   [
-    0x9c,
+    0x9C,
     {
       name: 'FlagLacing',
       cppname: 'TrackFlagLacing',
@@ -2089,7 +2089,7 @@ const schema = new Map([
     },
   ],
   [
-    0x55aa,
+    0x55AA,
     {
       name: 'FlagForced',
       cppname: 'TrackFlagForced',
@@ -2104,7 +2104,7 @@ const schema = new Map([
     },
   ],
   [
-    0xb9,
+    0xB9,
     {
       name: 'FlagEnabled',
       cppname: 'TrackFlagEnabled',
@@ -2119,7 +2119,7 @@ const schema = new Map([
     },
   ],
   [
-    0x73c5,
+    0x73C5,
     {
       name: 'TrackUID',
       level: 3,
@@ -2132,7 +2132,7 @@ const schema = new Map([
     },
   ],
   [
-    0xd7,
+    0xD7,
     {
       name: 'TrackNumber',
       level: 3,
@@ -2145,7 +2145,7 @@ const schema = new Map([
     },
   ],
   [
-    0xae,
+    0xAE,
     {
       name: 'TrackEntry',
       level: 2,
@@ -2157,7 +2157,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1654ae6b,
+    0x1654AE6B,
     {
       name: 'Tracks',
       level: 1,
@@ -2169,7 +2169,7 @@ const schema = new Map([
     },
   ],
   [
-    0xaf,
+    0xAF,
     {
       name: 'EncryptedBlock',
       level: 2,
@@ -2180,7 +2180,7 @@ const schema = new Map([
     },
   ],
   [
-    0xca,
+    0xCA,
     {
       name: 'ReferenceTimeCode',
       level: 4,
@@ -2194,7 +2194,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc9,
+    0xC9,
     {
       name: 'ReferenceOffset',
       level: 4,
@@ -2208,7 +2208,7 @@ const schema = new Map([
     },
   ],
   [
-    0xc8,
+    0xC8,
     {
       name: 'ReferenceFrame',
       level: 3,
@@ -2221,7 +2221,7 @@ const schema = new Map([
     },
   ],
   [
-    0xcf,
+    0xCF,
     {
       name: 'SliceDuration',
       level: 5,
@@ -2231,7 +2231,7 @@ const schema = new Map([
     },
   ],
   [
-    0xce,
+    0xCE,
     {
       name: 'Delay',
       cppname: 'SliceDelay',
@@ -2242,7 +2242,7 @@ const schema = new Map([
     },
   ],
   [
-    0xcb,
+    0xCB,
     {
       name: 'BlockAdditionID',
       cppname: 'SliceBlockAddID',
@@ -2254,7 +2254,7 @@ const schema = new Map([
     },
   ],
   [
-    0xcd,
+    0xCD,
     {
       name: 'FrameNumber',
       cppname: 'SliceFrameNumber',
@@ -2266,7 +2266,7 @@ const schema = new Map([
     },
   ],
   [
-    0xcc,
+    0xCC,
     {
       name: 'LaceNumber',
       cppname: 'SliceLaceNumber',
@@ -2280,7 +2280,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe8,
+    0xE8,
     {
       name: 'TimeSlice',
       level: 4,
@@ -2293,7 +2293,7 @@ const schema = new Map([
     },
   ],
   [
-    0x8e,
+    0x8E,
     {
       name: 'Slices',
       level: 3,
@@ -2304,7 +2304,7 @@ const schema = new Map([
     },
   ],
   [
-    0x75a2,
+    0x75A2,
     {
       name: 'DiscardPadding',
       level: 3,
@@ -2316,7 +2316,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa4,
+    0xA4,
     {
       name: 'CodecState',
       level: 3,
@@ -2328,7 +2328,7 @@ const schema = new Map([
     },
   ],
   [
-    0xfd,
+    0xFD,
     {
       name: 'ReferenceVirtual',
       level: 3,
@@ -2339,7 +2339,7 @@ const schema = new Map([
     },
   ],
   [
-    0xfb,
+    0xFB,
     {
       name: 'ReferenceBlock',
       level: 3,
@@ -2347,11 +2347,11 @@ const schema = new Map([
       multiple: true,
       minver: 1,
       description:
-        "Timestamp of another frame used as a reference (ie: B or P frame). The timestamp is relative to the block it's attached to.",
+        'Timestamp of another frame used as a reference (ie: B or P frame). The timestamp is relative to the block it\'s attached to.',
     },
   ],
   [
-    0xfa,
+    0xFA,
     {
       name: 'ReferencePriority',
       cppname: 'FlagReferenced',
@@ -2366,7 +2366,7 @@ const schema = new Map([
     },
   ],
   [
-    0x9b,
+    0x9B,
     {
       name: 'BlockDuration',
       level: 3,
@@ -2378,7 +2378,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa5,
+    0xA5,
     {
       name: 'BlockAdditional',
       level: 5,
@@ -2391,7 +2391,7 @@ const schema = new Map([
     },
   ],
   [
-    0xee,
+    0xEE,
     {
       name: 'BlockAddID',
       level: 5,
@@ -2405,7 +2405,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa6,
+    0xA6,
     {
       name: 'BlockMore',
       level: 4,
@@ -2418,7 +2418,7 @@ const schema = new Map([
     },
   ],
   [
-    0x75a1,
+    0x75A1,
     {
       name: 'BlockAdditions',
       level: 3,
@@ -2430,7 +2430,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa2,
+    0xA2,
     {
       name: 'BlockVirtual',
       level: 3,
@@ -2441,7 +2441,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa1,
+    0xA1,
     {
       name: 'Block',
       level: 3,
@@ -2453,7 +2453,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa0,
+    0xA0,
     {
       name: 'BlockGroup',
       level: 2,
@@ -2465,7 +2465,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa3,
+    0xA3,
     {
       name: 'SimpleBlock',
       level: 2,
@@ -2478,7 +2478,7 @@ const schema = new Map([
     },
   ],
   [
-    0xab,
+    0xAB,
     {
       name: 'PrevSize',
       cppname: 'ClusterPrevSize',
@@ -2490,7 +2490,7 @@ const schema = new Map([
     },
   ],
   [
-    0xa7,
+    0xA7,
     {
       name: 'Position',
       cppname: 'ClusterPosition',
@@ -2503,7 +2503,7 @@ const schema = new Map([
     },
   ],
   [
-    0x58d7,
+    0x58D7,
     {
       name: 'SilentTrackNumber',
       cppname: 'ClusterSilentTrackNumber',
@@ -2517,7 +2517,7 @@ const schema = new Map([
     },
   ],
   [
-    0xe7,
+    0xE7,
     {
       name: 'Timecode',
       cppname: 'ClusterTimecode',
@@ -2530,7 +2530,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1f43b675,
+    0x1F43B675,
     {
       name: 'Cluster',
       level: 1,
@@ -2542,7 +2542,7 @@ const schema = new Map([
     },
   ],
   [
-    0x4d80,
+    0x4D80,
     {
       name: 'MuxingApp',
       level: 2,
@@ -2553,7 +2553,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7ba9,
+    0x7BA9,
     {
       name: 'Title',
       level: 2,
@@ -2564,7 +2564,7 @@ const schema = new Map([
     },
   ],
   [
-    0x2ad7b2,
+    0x2AD7B2,
     {
       name: 'TimecodeScaleDenominator',
       level: 2,
@@ -2576,7 +2576,7 @@ const schema = new Map([
     },
   ],
   [
-    0x2ad7b1,
+    0x2AD7B1,
     {
       name: 'TimecodeScale',
       level: 2,
@@ -2589,7 +2589,7 @@ const schema = new Map([
     },
   ],
   [
-    0x69a5,
+    0x69A5,
     {
       name: 'ChapterTranslateID',
       level: 3,
@@ -2602,7 +2602,7 @@ const schema = new Map([
     },
   ],
   [
-    0x69bf,
+    0x69BF,
     {
       name: 'ChapterTranslateCodec',
       level: 3,
@@ -2615,7 +2615,7 @@ const schema = new Map([
     },
   ],
   [
-    0x69fc,
+    0x69FC,
     {
       name: 'ChapterTranslateEditionUID',
       level: 3,
@@ -2628,7 +2628,7 @@ const schema = new Map([
     },
   ],
   [
-    0x3e83bb,
+    0x3E83BB,
     {
       name: 'NextFilename',
       level: 2,
@@ -2639,7 +2639,7 @@ const schema = new Map([
     },
   ],
   [
-    0x3eb923,
+    0x3EB923,
     {
       name: 'NextUID',
       level: 2,
@@ -2652,7 +2652,7 @@ const schema = new Map([
     },
   ],
   [
-    0x3c83ab,
+    0x3C83AB,
     {
       name: 'PrevFilename',
       level: 2,
@@ -2663,7 +2663,7 @@ const schema = new Map([
     },
   ],
   [
-    0x3cb923,
+    0x3CB923,
     {
       name: 'PrevUID',
       level: 2,
@@ -2676,7 +2676,7 @@ const schema = new Map([
     },
   ],
   [
-    0x73a4,
+    0x73A4,
     {
       name: 'SegmentUID',
       level: 2,
@@ -2690,7 +2690,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1549a966,
+    0x1549A966,
     {
       name: 'Info',
       level: 1,
@@ -2703,7 +2703,7 @@ const schema = new Map([
     },
   ],
   [
-    0x53ac,
+    0x53AC,
     {
       name: 'SeekPosition',
       level: 3,
@@ -2715,7 +2715,7 @@ const schema = new Map([
     },
   ],
   [
-    0x53ab,
+    0x53AB,
     {
       name: 'SeekID',
       level: 3,
@@ -2726,7 +2726,7 @@ const schema = new Map([
     },
   ],
   [
-    0x4dbb,
+    0x4DBB,
     {
       name: 'Seek',
       cppname: 'SeekPoint',
@@ -2739,7 +2739,7 @@ const schema = new Map([
     },
   ],
   [
-    0x114d9b74,
+    0x114D9B74,
     {
       name: 'SeekHead',
       cppname: 'SeekHeader',
@@ -2751,7 +2751,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7e7b,
+    0x7E7B,
     {
       name: 'SignatureElementList',
       level: 2,
@@ -2764,7 +2764,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7e5b,
+    0x7E5B,
     {
       name: 'SignatureElements',
       level: 1,
@@ -2775,7 +2775,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7eb5,
+    0x7EB5,
     {
       name: 'Signature',
       level: 1,
@@ -2785,7 +2785,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7ea5,
+    0x7EA5,
     {
       name: 'SignaturePublicKey',
       level: 1,
@@ -2796,7 +2796,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7e9a,
+    0x7E9A,
     {
       name: 'SignatureHash',
       level: 1,
@@ -2806,7 +2806,7 @@ const schema = new Map([
     },
   ],
   [
-    0x7e8a,
+    0x7E8A,
     {
       name: 'SignatureAlgo',
       level: 1,
@@ -2816,7 +2816,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1b538667,
+    0x1B538667,
     {
       name: 'SignatureSlot',
       level: -1,
@@ -2827,7 +2827,7 @@ const schema = new Map([
     },
   ],
   [
-    0xbf,
+    0xBF,
     {
       name: 'CRC-32',
       level: -1,
@@ -2835,11 +2835,11 @@ const schema = new Map([
       minver: 1,
       webm: false,
       description:
-        "The CRC is computed on all the data of the Master element it's in. The CRC element should be the first in it's parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian",
+        'The CRC is computed on all the data of the Master element it\'s in. The CRC element should be the first in it\'s parent master for easier reading. All level 1 elements should include a CRC-32. The CRC in use is the IEEE CRC32 Little Endian',
     },
   ],
   [
-    0xec,
+    0xEC,
     {
       name: 'Void',
       level: -1,
@@ -2850,7 +2850,7 @@ const schema = new Map([
     },
   ],
   [
-    0x42f3,
+    0x42F3,
     {
       name: 'EBMLMaxSizeLength',
       level: 1,
@@ -2859,11 +2859,11 @@ const schema = new Map([
       default: 8,
       minver: 1,
       description:
-        "The maximum length of the sizes you'll find in this file (8 or less in Matroska). This does not override the element size indicated at the beginning of an element. Elements that have an indicated size which is larger than what is allowed by EBMLMaxSizeLength shall be considered invalid.",
+        'The maximum length of the sizes you\'ll find in this file (8 or less in Matroska). This does not override the element size indicated at the beginning of an element. Elements that have an indicated size which is larger than what is allowed by EBMLMaxSizeLength shall be considered invalid.',
     },
   ],
   [
-    0x42f2,
+    0x42F2,
     {
       name: 'EBMLMaxIDLength',
       level: 1,
@@ -2872,11 +2872,11 @@ const schema = new Map([
       default: 4,
       minver: 1,
       description:
-        "The maximum length of the IDs you'll find in this file (4 or less in Matroska).",
+        'The maximum length of the IDs you\'ll find in this file (4 or less in Matroska).',
     },
   ],
   [
-    0x42f7,
+    0x42F7,
     {
       name: 'EBMLReadVersion',
       level: 1,
@@ -2889,7 +2889,7 @@ const schema = new Map([
     },
   ],
   [
-    0x1a45dfa3,
+    0x1A45DFA3,
     {
       name: 'EBML',
       level: 0,
@@ -2901,6 +2901,6 @@ const schema = new Map([
         'Set the EBML characteristics of the data to follow. Each EBML document has to start with this.',
     },
   ],
-]);
+])
 
-export default schema;
+export default schema

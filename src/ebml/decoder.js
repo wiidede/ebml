@@ -1,121 +1,119 @@
-import { Transform } from 'stream';
-import tools from './tools';
-import schema from './schema';
+import { Transform } from 'node:stream'
+import schema from './schema'
+import tools from './tools'
 
-const debug = require('debug')('ebml:decoder');
-
-const STATE_TAG = 1;
-const STATE_SIZE = 2;
-const STATE_CONTENT = 3;
+const STATE_TAG = 1
+const STATE_SIZE = 2
+const STATE_CONTENT = 3
 
 export default class EbmlDecoder extends Transform {
   /**
-   * @property
-   * @private
-   * @type {Buffer}
-   */
-  mBuffer = null;
-
-  /**
-   * @private
-   * @property
-   * @readonly
-   */
-  mTagStack = [];
-
-  /**
-   * @property
-   * @private
-   * @type {Number}
-   */
-  mState = STATE_TAG;
-
-  /**
-   * @property
-   * @private
-   * @type {Number}
-   */
-  mCursor = 0;
-
-  /**
-   * @property
-   * @private
-   * @type {Number}
-   */
-  mTotal = 0;
-
-  /**
    * @constructor
-   * @param {Object} options The options to be passed along to the super class
+   * @param {object} options The options to be passed along to the super class
    */
   constructor(options = {}) {
-    super({ ...options, readableObjectMode: true });
+    super({ ...options, readableObjectMode: true })
+    /**
+     * @property {Uint8Array} mBuffer The buffer containing the decoded EBML data
+     * @private
+     * @type {Uint8Array}
+     */
+    this.mBuffer = null
+
+    /**
+     * @private
+     * @property {Array} mTagStack The stack of tags
+     * @readonly
+     */
+    this.mTagStack = []
+
+    /**
+     * @property {number} mState The current state of the decoder
+     * @private
+     * @type {number}
+     */
+    this.mState = STATE_TAG
+
+    /**
+     * @property {number} mCursor The current cursor position in the buffer
+     * @private
+     * @type {number}
+     */
+    this.mCursor = 0
+
+    /**
+     * @property {number} mTotal The total length of the decoded EBML data
+     * @private
+     * @type {number}
+     */
+    this.mTotal = 0
   }
 
   get buffer() {
-    return this.mBuffer;
+    return this.mBuffer
   }
 
   get cursor() {
-    return this.mCursor;
+    return this.mCursor
   }
 
   get state() {
-    return this.mState;
+    return this.mState
   }
 
   get tagStack() {
-    return this.mTagStack;
+    return this.mTagStack
   }
 
   get total() {
-    return this.mTotal;
+    return this.mTotal
   }
 
   set buffer(buffer) {
-    this.mBuffer = buffer;
+    this.mBuffer = buffer
   }
 
   /**
    * @param {number} cursor
    */
   set cursor(cursor) {
-    this.mCursor = cursor;
+    this.mCursor = cursor
   }
 
   set state(state) {
-    this.mState = state;
+    this.mState = state
   }
 
   set total(total) {
-    this.mTotal = total;
+    this.mTotal = total
   }
 
   _transform(chunk, enc, done) {
     if (!this.buffer) {
-      this.buffer = Buffer.from(chunk);
-    } else {
-      this.buffer = tools.concatenate(this.buffer, Buffer.from(chunk));
+      this.buffer = new Uint8Array(chunk)
+    }
+    else {
+      this.buffer = tools.concatenate(this.buffer, new Uint8Array(chunk))
     }
 
     while (this.cursor < this.buffer.length) {
       if (this.state === STATE_TAG && !this.readTag()) {
-        break;
+        break
       }
       if (this.state === STATE_SIZE && !this.readSize()) {
-        break;
+        break
       }
       if (this.state === STATE_CONTENT && !this.readContent()) {
-        break;
+        break
       }
     }
 
-    done();
+    done()
   }
 
   static getSchemaInfo(tag) {
     if (Number.isInteger(tag) && schema.has(tag)) {
-      return schema.get(tag);
+      return schema.get(tag)
     }
     return {
       type: null,
@@ -125,44 +123,30 @@ export default class EbmlDecoder extends Transform {
       minver: -1,
       multiple: false,
       webm: false,
-    };
+    }
   }
 
   readTag() {
-    /* istanbul ignore if */
-    if (debug.enabled) {
-      debug('parsing tag');
-    }
-
     if (this.cursor >= this.buffer.length) {
-      /* istanbul ignore if */
-      if (debug.enabled) {
-        debug('waiting for more data');
-      }
-      return false;
+      return false
     }
 
-    const start = this.total;
-    const tag = tools.readVint(this.buffer, this.cursor);
+    const start = this.total
+    const tag = tools.readVint(this.buffer, this.cursor)
 
     if (tag == null) {
-      /* istanbul ignore if */
-      if (debug.enabled) {
-        debug('waiting for more data');
-      }
-
-      return false;
+      return false
     }
 
     const tagStr = tools.readHexString(
       this.buffer,
       this.cursor,
       this.cursor + tag.length,
-    );
-    const tagNum = Number.parseInt(tagStr, 16);
-    this.cursor += tag.length;
-    this.total += tag.length;
-    this.state = STATE_SIZE;
+    )
+    const tagNum = Number.parseInt(tagStr, 16)
+    this.cursor += tag.length
+    this.total += tag.length
+    this.state = STATE_SIZE
 
     const tagObj = {
       tag: tag.value,
@@ -171,126 +155,82 @@ export default class EbmlDecoder extends Transform {
       name: EbmlDecoder.getSchemaInfo(tagNum).name,
       start,
       end: start + tag.length,
-    };
-
-    this.tagStack.push(tagObj);
-    /* istanbul ignore if */
-    if (debug.enabled) {
-      debug(`read tag: ${tagStr}`);
     }
 
-    return true;
+    this.tagStack.push(tagObj)
+    return true
   }
 
   readSize() {
-    const tagObj = this.tagStack[this.tagStack.length - 1];
-
-    /* istanbul ignore if */
-    if (debug.enabled) {
-      debug(`parsing size for tag: ${tagObj.tagStr}`);
-    }
+    const tagObj = this.tagStack[this.tagStack.length - 1]
 
     if (this.cursor >= this.buffer.length) {
-      /* istanbul ignore if */
-      if (debug.enabled) {
-        debug('waiting for more data');
-      }
-
-      return false;
+      return false
     }
 
-    const size = tools.readVint(this.buffer, this.cursor);
+    const size = tools.readVint(this.buffer, this.cursor)
 
     if (size == null) {
-      /* istanbul ignore if */
-      if (debug.enabled) {
-        debug('waiting for more data');
-      }
-
-      return false;
+      return false
     }
 
-    this.cursor += size.length;
-    this.total += size.length;
-    this.state = STATE_CONTENT;
-    tagObj.dataSize = size.value;
+    this.cursor += size.length
+    this.total += size.length
+    this.state = STATE_CONTENT
+    tagObj.dataSize = size.value
 
     // unknown size
     if (size.value === -1) {
-      tagObj.end = -1;
-    } else {
-      tagObj.end += size.value + size.length;
+      tagObj.end = -1
     }
-    /* istanbul ignore if */
-    if (debug.enabled) {
-      debug(`read size: ${size.value}`);
+    else {
+      tagObj.end += size.value + size.length
     }
 
-    return true;
+    return true
   }
 
   readContent() {
     const { tagStr, type, dataSize, ...rest } = this.tagStack[
       this.tagStack.length - 1
-    ];
-
-    /* istanbul ignore if */
-    if (debug.enabled) {
-      debug(`parsing content for tag: ${tagStr}`);
-    }
+    ]
 
     if (type === 'm') {
-      /* istanbul ignore if */
-      if (debug.enabled) {
-        debug('content should be tags');
-      }
-      this.push(['start', { tagStr, type, dataSize, ...rest }]);
-      this.state = STATE_TAG;
+      this.push(['start', { tagStr, type, dataSize, ...rest }])
+      this.state = STATE_TAG
 
-      return true;
+      return true
     }
 
     if (this.buffer.length < this.cursor + dataSize) {
-      /* istanbul ignore if */
-      if (debug.enabled) {
-        debug(`got: ${this.buffer.length}`);
-        debug(`need: ${this.cursor + dataSize}`);
-        debug('waiting for more data');
-      }
-
-      return false;
+      return false
     }
 
-    const data = this.buffer.subarray(this.cursor, this.cursor + dataSize);
-    this.total += dataSize;
-    this.state = STATE_TAG;
-    this.buffer = this.buffer.subarray(this.cursor + dataSize);
-    this.cursor = 0;
+    const data = this.buffer.subarray(this.cursor, this.cursor + dataSize)
+    this.total += dataSize
+    this.state = STATE_TAG
+    this.buffer = this.buffer.subarray(this.cursor + dataSize)
+    this.cursor = 0
 
-    this.tagStack.pop(); // remove the object from the stack
+    this.tagStack.pop() // remove the object from the stack
 
     this.push([
       'tag',
       tools.readDataFromTag(
         { tagStr, type, dataSize, ...rest },
-        Buffer.from(data),
+        new Uint8Array(data),
       ),
-    ]);
+    ])
 
     while (this.tagStack.length > 0) {
-      const topEle = this.tagStack[this.tagStack.length - 1];
+      const topEle = this.tagStack[this.tagStack.length - 1]
       if (this.total < topEle.end) {
-        break;
+        break
       }
-      this.push(['end', topEle]);
-      this.tagStack.pop();
+      this.push(['end', topEle])
+      this.tagStack.pop()
     }
 
-    /* istanbul ignore if */
-    if (debug.enabled) {
-      debug(`read data: ${data.toString('hex')}`);
-    }
-
-    return true;
+    return true
   }
 }

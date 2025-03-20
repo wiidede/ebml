@@ -1,3 +1,14 @@
+# @wiidede/ebml
+
+forked from [embl](https://github.com/node-ebml/node-ebml)
+
+## Changes
+
+- esm only
+- remove debug
+
+---
+
 # EBML [![NPM](https://nodei.co/npm/ebml.png?compact=true)](https://www.npmjs.com/package/ebml) [![Coverage Status](https://codecov.io/gh/node-ebml/node-ebml/branch/master/graph/badge.svg)](https://codecov.io/gh/node-ebml/node-ebml) [![Greenkeeper badge](https://badges.greenkeeper.io/node-ebml/node-ebml.svg)](https://greenkeeper.io/)
 
 [EBML][ebml] stands for Extensible Binary Meta-Language and is somewhat of a
@@ -39,7 +50,7 @@ arrays looking like this example.
     type: 'u',
     value: 1000000,
   },
-];
+]
 ```
 
 The first element of the array is a short text string. For tags containing
@@ -78,40 +89,40 @@ This example reads a media file into memory and decodes it. The `decoder`
 invokes its `data` event for each Element.
 
 ```js
-const fs = require('fs');
-const { Decoder } = require('./lib/ebml.js');
+const fs = require('node:fs')
+const { Decoder } = require('./lib/ebml.js')
 
-const decoder = new Decoder();
+const decoder = new Decoder()
 
-decoder.on('data', (chunk) => console.log(chunk));
+decoder.on('data', chunk => console.log(chunk))
 
 fs.readFile('media/test.webm', (err, data) => {
   if (err) {
-    throw err;
+    throw err
   }
-  decoder.write(data);
-});
+  decoder.write(data)
+})
 ```
 
 This example does the same thing, but by piping the file stream into the decoder (a Transform stream).
 
 ```js
-const { Decoder } = require('./lib/ebml.js');
+const { Decoder } = require('./lib/ebml.js')
 
-const ebmlDecoder = new Decoder();
-const counts = {};
+const ebmlDecoder = new Decoder()
+const counts = {}
 
-require('fs')
+require('node:fs')
   .createReadStream('media/test.webm')
   .pipe(ebmlDecoder)
   .on('data', (chunk) => {
-    const { name } = chunk[1];
+    const { name } = chunk[1]
     if (!counts[name]) {
-      counts[name] = 0;
+      counts[name] = 0
     }
-    counts[name] += 1;
+    counts[name] += 1
   })
-  .on('finish', () => console.log(counts));
+  .on('finish', () => console.log(counts))
 ```
 
 # State of this project
