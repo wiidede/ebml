@@ -1,7 +1,7 @@
 {
   "name": "@wiidede/ebml",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "packageManager": "pnpm@10.6.5",
   "description": "ebml for web using web streams api and uint8array",
   "license": "MIT",
